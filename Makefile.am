@@ -34,4 +34,4 @@ endif
 @DX_RULES@
 
 clean-doc:
-	rm -r doc/*
+	rm -rf doc
