@@ -13,9 +13,22 @@ coverage: $(bin_PROGRAMS) $(lib_LTLIBRARIES)
 	@gcov -o src/.libs src/argparse.c
 endif
 
+lib_LTLIBRARIES = libargparse.la
+libargparse_la_SOURCES = src/argparse.c \
+			 src/operand.h \
+			 src/operand.c \
+			 src/option.h \
+			 src/option.c \
+			 src/parse.c
+include_HEADERS = src/argparse.h
+
 if ENABLE_TESTS
-TESTS = 
-bin_PROGRAMS =
+TESTS = tests/argparse
+bin_PROGRAMS = tests/argparse
+tests_argparse_CFLAGS = $(AM_CFLAGS) -lcmocka
+tests_argparse_LDFLAGS = $(AM_LDFLAGS)
+tests_argparse_SOURCES = tests/argparse.c
+tests_argparse_LDADD = libargparse.la
 endif
 
 @DX_RULES@
