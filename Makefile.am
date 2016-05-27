@@ -9,8 +9,11 @@ if ENABLE_COVERAGE
 AM_CFLAGS += --coverage
 AM_LDFLAGS += --coverage
 
-coverage: $(bin_PROGRAMS) $(lib_LTLIBRARIES)
-	@gcov -o src/.libs src/argparse.c
+coverage-reset:
+	@find . -iname '*.gcno' -or -iname '*.gcda' -or -iname '*.gcov' -delete
+
+coverage:
+	gcov -o src/.libs $(libargparse_la_SOURCES)
 endif
 
 lib_LTLIBRARIES = libargparse.la
