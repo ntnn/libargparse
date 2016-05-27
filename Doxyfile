@@ -1,0 +1,19 @@
+PROJECT_NAME           = "argparse"
+OUTPUT_DIRECTORY       = doc
+FULL_PATH_NAMES        = NO
+JAVADOC_AUTOBRIEF      = YES
+OPTIMIZE_OUTPUT_FOR_C  = YES
+
+INPUT                  = src tests
+RECURSIVE              = YES
+
+# show all entities even without documentation
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_PACKAGE        = YES
+EXTRACT_LOCAL_CLASSES  = YES
+
+# output formats
+GENERATE_LATEX         = NO
+GENERATE_MAN           = YES

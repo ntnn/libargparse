@@ -1,0 +1,27 @@
+*.o
+*.lo
+*.la
+doc/
+
+tests/argparse
+
+## autotools
+aclocal.m4
+autom4te.cache/
+config.log
+config.status
+configure
+.deps/
+.dirstamp
+etc/
+.libs/
+libtool
+*.log
+Makefile
+Makefile.in
+*.trs
+
+## gcov
+*.gcda
+*.gcno
+*.gcov
