@@ -4,9 +4,6 @@
 #define UNIT_TESTING 1
 #include <cmocka.h>
 
-#include <stdio.h>
-#include <limits.h>
-
 #include "argparse.h"
 
 static void argparse_args_empty() {
