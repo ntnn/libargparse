@@ -37,6 +37,11 @@ tests_option_SOURCES = tests/option.c
 tests_parse_SOURCES = tests/parse.c
 endif
 
+examplesdir = examples
+examples_PROGRAMS = examples/echo
+examples_argparse_SOURCES = examples/echo.c
+examples_argparse_LDADD = libargparse.la
+
 @DX_RULES@
 
 clean-doc:

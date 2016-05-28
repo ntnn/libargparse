@@ -8,6 +8,8 @@ tests/operand
 tests/option
 tests/parse
 
+examples/echo
+
 ## autotools
 aclocal.m4
 autom4te.cache/
