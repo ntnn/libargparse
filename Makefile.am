@@ -26,13 +26,19 @@ libargparse_la_SOURCES = src/argparse.c \
 include_HEADERS = src/argparse.h
 
 if ENABLE_TESTS
-TESTS = tests/argparse
+TESTS = tests/argparse \
+	tests/operand \
+	tests/option \
+	tests/parse
 
 check_PROGRAMS = $(TESTS)
 CFLAGS += -lcmocka
 LDADD = libargparse.la
 
 tests_argparse_SOURCES = tests/argparse.c
+tests_operand_SOURCES = tests/operand.c
+tests_option_SOURCES = tests/option.c
+tests_parse_SOURCES = tests/parse.c
 endif
 
 @DX_RULES@

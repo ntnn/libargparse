@@ -4,6 +4,9 @@
 doc/
 
 tests/argparse
+tests/operand
+tests/option
+tests/parse
 
 ## autotools
 aclocal.m4
