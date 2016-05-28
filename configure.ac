@@ -18,14 +18,6 @@ DX_INIT_DOXYGEN(argparse, Doxyfile, doc)
 
 AC_CONFIG_FILES(Makefile)
 
-# --enable-debug
-AC_ARG_ENABLE(debug,
-              AS_HELP_STRING(--enable-debug, set debug build flags),
-              enable_debug="$enable_debug",
-              enable_debug="no"
-              )
-AM_CONDITIONAL(ENABLE_DEBUG, test "x$enable_debug" = "xyes")
-
 # --enable-coverage
 AC_ARG_ENABLE(coverage,
               AS_HELP_STRING(--enable-coverage, set coverage build flags),

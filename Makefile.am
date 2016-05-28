@@ -1,10 +1,6 @@
 AM_CFLAGS = -Isrc
 AM_LDFLAGS =
 
-if ENABLE_DEBUG
-AM_CFLAGS += -g
-endif
-
 if ENABLE_COVERAGE
 AM_CFLAGS += --coverage
 AM_LDFLAGS += --coverage
