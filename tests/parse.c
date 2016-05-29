@@ -225,6 +225,37 @@ static void parse_long_opt_without() {
     args_free(args);
 }
 
+static void parse_long_opt_arg() {
+    args *args = args_new();
+
+    args_add_option(args, common_opt_create("accept"));
+    const char *arguments[2] = { "--create", "argument" };
+
+    assert_true(EXIT_SUCCESS == args_parse(args, 2, arguments));
+
+    option *opt = option_find(args, "create");
+    assert_true(opt->present);
+    assert_string_equal(opt->argument->string, "argument");
+
+    args_free(args);
+}
+
+static void parse_long_opt_arg_with_equals() {
+    args *args = args_new();
+
+    args_add_option(args, common_opt_create("accept"));
+    const char *arguments[1] = { "--create=argument" };
+
+    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
+
+    option *opt = option_find(args, "create");
+    assert_true(opt->present);
+    assert_non_null(opt->argument);
+    assert_string_equal(opt->argument->string, "argument");
+
+    args_free(args);
+}
+
 static void parse_multiple_short_opt() {
     args *args = args_new();
 
@@ -353,9 +384,18 @@ int main() {
         cmocka_unit_test(parse_one_long_opt),
         cmocka_unit_test(parse_one_long_opt_disable),
         cmocka_unit_test(parse_one_long_opt_no),
+        cmocka_unit_test(parse_long_opt),
+        cmocka_unit_test(parse_long_opt_enable),
+        cmocka_unit_test(parse_long_opt_disable),
+        cmocka_unit_test(parse_long_opt_no),
+        cmocka_unit_test(parse_long_opt_with),
+        cmocka_unit_test(parse_long_opt_without),
+        cmocka_unit_test(parse_long_opt_arg),
+        cmocka_unit_test(parse_long_opt_arg_with_equals),
         cmocka_unit_test(parse_multiple_short_opt),
         cmocka_unit_test(parse_multiple_long_opt),
         cmocka_unit_test(parse_mixed_opt_parse),
+        cmocka_unit_test(parse_mixed_opt_with_operands),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
