@@ -2,6 +2,7 @@
 #define ARGPARSE_OPTION_H
 
 #include "argparse.h"
+#include "operand.h"
 
 /** Recursively frees an option struct.
  * Only useful if the option to be free'd is not related to an args
@@ -22,5 +23,15 @@ void option_free(option *opt);
  *          EXIT_SUCCESS otherwise
  */
 int option_help(const option *opt, FILE *stream);
+
+/** Add and argument to an option
+ *
+ *  \param opt option struct to add to option-argument to
+ *  \param op operand struct to add to option
+ *  \return EXIT_FAILURE if:
+ *          - opt or op are NULL
+ *          EXIT_SUCCESS otherwise
+ */
+int option_add_argument(option *opt, operand *op);
 
 #endif // ARGPARSE_OPTION_H

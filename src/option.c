@@ -79,3 +79,19 @@ option *option_find(const args *args, const char *opt) {
 
     return NULL;
 }
+
+int option_add_argument(option *opt, operand *op) {
+    if (!opt || !op)
+        return EXIT_FAILURE;
+
+    operand *cur = opt->argument;
+    if (!cur)
+        opt->argument = op;
+    else {
+        while (cur->next)
+            cur = cur->next;
+        cur->next = op;
+    }
+
+    return EXIT_SUCCESS;
+}
