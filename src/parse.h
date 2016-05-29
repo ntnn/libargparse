@@ -2,28 +2,27 @@
 #define ARGPARSE_PARSE_H
 
 #include "argparse.h"
+#include "option.h"
+#include "operand.h"
 
-/** Parses a series of short options in the form '-abcd' and sets the
- * passed present value for each of them.
+/** Parses an arbitrary number of short options in the form of '-abcde'.
  *
- *  \param args args struct containing the options
- *  \param passed pointer to char array to parse
- *  \param present value to set as `->present` in each option
- *  \returns a pointer to the last option, if it accepts or requires an
- *           argument
+ *  \param args Args struct to find options in
+ *  \param argument Pointer to string to parse
+ *  \param option_argument Pointer to set a possible argument to, if the
+ *         option allows or requires arguments
+ *  \returns Pointer to option if it allows or requires arguments
  */
-option *parse_short_opts(args *args, char *passed, int present);
+option *parse_short(args *args, const char *argument);
 
-/** Parses a single argument into an operand.
+/** Parses a long option in the form of '--option(=argument)
  *
- *  \param args args struct to append operand to
- *  \param passed argument to parse into operand
- *  \returns EXIT_FAILURE if:
- *           - args or passed are NULL
- *           - memory allocation failed
- *           EXIT_SUCCESS otherwise
+ *  \param args Args struct to find option in
+ *  \param argument Pointer to string to parse
+ *  \param option_argument Pointer to set a possible argument to, if the
+ *         option allows or requires arguments
+ *  \returns Pointer to option if it allows or requires arguments
  */
-int parse_operand(args *args, char *passed);
+option *parse_long(args *args, const char *argument);
 
 #endif // ARGPARSE_PARSE_H
-

@@ -1,107 +1,180 @@
 #include "parse.h"
 
-option *parse_short_opts(args *args, char *passed, int present) {
-    // TODO check if passed is a long option
+option *parse_short(args *args, const char *argument) {
+    int present = 1;
+    if (strncmp(argument, "+", 1) == 0)
+        present = -1;
 
-    for (size_t i = 0; i < strlen(passed); ++i) {
+    /** argument = argument + sizeof(char); */
+    argument++;
+
+    for (size_t i = 0; i < strlen(argument); ++i) {
         // this is ugly
-        char pass[0];
-        pass[0] = passed[i];
+        char pass[1] = { argument[i] };
         option *opt = option_find(args, pass);
 
         if (opt) {
             opt->present = present;
-            if (opt->requires_arguments || opt->accepts_arguments)
+
+            if (opt->requires_arguments || opt->accepts_arguments) {
+                if (strlen(argument) > i + 1) {
+                    // TODO check if opt only accepts arguments and if the
+                    // next character are options
+                    option_add_argument(
+                            opt,
+                            operand_parse(
+                                argument + (sizeof(char) * i) + sizeof(char),
+                                opt->argument_delimiter
+                                )
+                            );
+                    return NULL;
+                }
+
                 return opt;
+            }
         } else {
             // TODO error handling
+            // option could not be found
+            return NULL;
         }
     }
     return NULL;
 }
 
-// TODO
-// i don't like this, it's too close to operand_parse, especially since
-// operand_parse is safer and could be called with space as
-// argument_delimiter. maybe rewrite this as a wrapper for operand_parse
-// (and with a different name)
-int parse_operand(args *args, char *passed) {
-    operand *new_op = operand_new(passed);
-    if (!new_op)
-        return EXIT_FAILURE;
+option *parse_long(args *args, const char *argument) {
+    argument = argument + strlen("--");
+    size_t present = 1;
 
-    if (args->operands) {
-        operand *cur = args->operands;
-        while (cur->next)
-            cur = cur->next;
-        cur->next = new_op;
-    } else
-        args->operands = new_op;
+    char *prefixes[5] = {
+        "no",
+        "disable",
+        "without",
+        "enable",
+        "with",
+    };
 
-    args->operandsc++;
-    return EXIT_SUCCESS;
-}
+    // index that separates present=1 and present=-1
+    int sepindex = 3;
 
-int args_parse(args *args, size_t argc, char **argv) {
-    for (size_t i = 0; i < argc; ++i) {
-        option *opt = NULL;
-        if (strcmp(argv[i], "--") == 0) {
-            // double dash is specified, only operands follow
-
-            for (size_t j = i; j < argc; ++j)
-                parse_operand(args, argv[j]);
-
-            return EXIT_SUCCESS;
-
-        } else if (strncmp(argv[i], "--", 2) == 0) {
-            // double dash with more characters, long option
-            size_t offset = 2;
-            size_t present = 1;
-            if (strncmp(argv[i], "--no-", 5) == 0) {
+    for (int j = 0; j < sizeof(prefixes) / sizeof(char*); ++j) {
+        char *prefix = prefixes[j];
+        if (strncmp(argument,
+                    prefix,
+                    strlen(prefix)
+                    ) == 0) {
+            if (j >= sepindex)
+                present = 1;
+            else
                 present = -1;
-                offset = 5;
-            }
+            // cut off prefix and trailing dash
+            argument = argument + strlen(prefix) + strlen("-");
 
-            if (strncmp(argv[i], "--disable-", 10) == 0) {
-                present = -1;
-                offset = 10;
-            }
+            break;
+        }
+    }
 
-            // parse_long_opts
-            opt = option_find(args, &argv[i][offset]);
-            opt->present = present;
-        } else if (argv[i][0] == '-' || argv[i][0] == '+') {
+    option *opt = NULL;
 
-            int present = 1;
-            if (argv[i][0] == '+')
-                present = -1;
+    char *equals = strchr(argument, '=');
+    if (equals) {
+        // equals sign was found, argument is in the form
+        // --(prefix-)feature=argument
+        char *option_argument = equals + sizeof(char);
 
-            // parse_short_opts returns a pointer to an option in if it
-            // accepts an option. POSIX specifies that only the last
-            // short option should require or accept an option-argument
-            opt = parse_short_opts(args, &argv[i][1], present);
-        } else {
-            parse_operand(args, argv[i]);
+        size_t arglen = (size_t)equals - (size_t)argument;
+        char *temp = malloc((equals - argument) * sizeof(char));
+
+        strncpy(temp, argument, arglen);
+
+        opt = option_find(args, temp);
+
+        free(temp);
+
+        if (!opt->accepts_arguments && !opt->requires_arguments) {
+            // TODO error handling, detected equals sign even though the
+            // option neither accepts nor requires and argument
+            return NULL;
         }
 
-        if (opt
-                && (opt->accepts_arguments || opt->requires_arguments)
-               ) {
-            if (opt->requires_arguments
-                    && (i + 1 >= argc
-                        || strcmp(argv[i + 1], "--") == 0))
-                // option requires an argument but none is supplied
-                // or the next argument is a double dash
-                return EXIT_FAILURE;
+        opt->present = present;
+        option_add_argument(opt,
+                operand_parse(option_argument, opt->argument_delimiter)
+                );
 
-            if (i + 1 < argc
-                    && argv[i + 1][0] != '-') {
-                opt->argument = operand_parse(
-                        argv[i + 1],
-                        opt->argument_delimiter
+        return NULL;
+    }
+
+    opt = option_find(args, argument);
+    opt->present = present;
+
+    if (opt->accepts_arguments || opt->requires_arguments)
+        return opt;
+
+    return NULL;
+}
+
+int args_parse(args *args, const size_t argc, const char **argv) {
+    for (size_t i = 0; i < argc; ++i) {
+        option *opt = NULL;
+        const char *argument = argv[i];
+
+        if (strcmp(argument, "--") == 0) {
+            for (size_t j = i + 1; j < argc; ++j) {
+                args_add_operand(
+                        args,
+                        operand_parse(argv[j], ' ')
                         );
-                ++i;
             }
+
+            return EXIT_SUCCESS;
+        } else if (strncmp(argument, "--", 2) == 0) {
+            opt = parse_long(args, argument);
+        } else if (
+                strncmp(argument, "-", 1) == 0
+                || strncmp(argument, "+", 1) == 0
+                ) {
+            opt = parse_short(args, argument);
+        } else {
+            args_add_operand(
+                    args,
+                    operand_parse(argv[i], ' ')
+                    );
+        }
+
+        if (opt) {
+            if (!opt->accepts_arguments && !opt->requires_arguments) {
+                // TODO error handling, opt was returned even though it
+                // doesn't accept nor require arguments
+                return EXIT_FAILURE;
+            }
+
+            ++i;
+            if (i >= argc) {
+                if (opt->requires_arguments) {
+                    // TODO error handling, option requires argument
+                    // but none is given
+                    return EXIT_FAILURE;
+                } else if (opt->accepts_arguments) {
+                    // last option, option accepts arguments and
+                    // none is given, return success
+                    return EXIT_SUCCESS;
+                }
+            }
+
+            if (strncmp(argv[i], "-", 1) == 0) {
+                // next argument starts like an option
+                if (opt->requires_arguments) {
+                    // TODO error handling, option requires argument
+                    // but next is option
+                    return EXIT_FAILURE;
+                } else if (opt->accepts_arguments) {
+                    // option accepts argument but none is given,
+                    // continue
+                    continue;
+                }
+            }
+
+            opt->argument = operand_parse(argv[i], opt->argument_delimiter);
         }
     }
 
