@@ -9,27 +9,21 @@ int main(size_t argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    option *opt = option_new();
+    option *opt = option_new("n", "", "do not output a trailing newline");
     if (!opt) {
         fprintf(stderr, "option could not be initialized, aborting.\n");
         return EXIT_FAILURE;
     }
-
-    opt->description = "do not output the trailing newline";
-    opt->short_opt = "n";
-    args_add_opt(args, opt);
+    args_add_option(args, opt);
 
     // the pointer can be reused as args_free() takes care of
     // freeing everything correctly
-    opt = option_new();
+    opt = option_new("e", "", "enable interpretation of backslash escapes");
     if (!opt) {
         fprintf(stderr, "option could not be initialized, aborting.\n");
         return EXIT_FAILURE;
     }
-
-    opt->description = "enable interpretation of backslash escapes";
-    opt->short_opt = "e";
-    args_add_opt(args, opt);
+    args_add_option(args, opt);
 
     // pass command line arguments (without the leading $0) to let
     // argparse parse them

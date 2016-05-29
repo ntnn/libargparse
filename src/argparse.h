@@ -96,7 +96,7 @@ option *option_new(
  *           long_opt are NULL
  *           EXIT_SUCCESS otherwise
  */
-int args_add_opt(args *args, option *opt);
+int args_add_option(args *args, option *opt);
 
 /** Find option by short or long option.
  *

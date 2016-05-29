@@ -27,7 +27,7 @@ void args_free(args *args) {
     free(args);
 }
 
-int args_add_opt(args *args, option *opt) {
+int args_add_option(args *args, option *opt) {
     if (!args || !opt)
         return EXIT_FAILURE;
 
