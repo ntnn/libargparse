@@ -55,3 +55,27 @@ int option_help(option *opt, FILE *stream) {
     printf("\n");
     return EXIT_SUCCESS;
 }
+
+option *option_find(const args *args, const char *opt) {
+    bool short_opt = false;
+    char *passed;
+    if (strlen(opt) == 1)
+        short_opt = true;
+
+    option *cur = args->opts;
+    const char *compare;
+    while (cur) {
+        if (short_opt && cur->short_opt)
+            compare = cur->short_opt;
+        else if (cur->long_opt)
+            compare = cur->long_opt;
+
+        if (compare && strcmp(opt, compare) == 0)
+            return cur;
+
+        compare = NULL;
+        cur = cur->next;
+    }
+
+    return NULL;
+}
