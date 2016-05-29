@@ -135,7 +135,7 @@ static void parse_short_opt_require_with_multiple_arg_no_space() {
     assert_true(opt->present);
 
     opt = option_find(args, "destroy");
-    assert_true(opt->present);
+    assert_false(opt->present);
 
     args_free(args);
 }
