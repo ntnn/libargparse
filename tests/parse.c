@@ -10,7 +10,7 @@
 #include "parse.h"
 #include "common.h"
 
-static void parse_one_short_opt() {
+static void parse_short_opt() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create(""));
@@ -22,7 +22,7 @@ static void parse_one_short_opt() {
     args_free(args);
 }
 
-static void parse_one_short_opt_negate() {
+static void parse_short_opt_negate() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create(""));
@@ -34,7 +34,7 @@ static void parse_one_short_opt_negate() {
     args_free(args);
 }
 
-static void parse_one_short_opt_accept_without_arg() {
+static void parse_short_opt_accept_without_arg() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create("accept"));
@@ -46,7 +46,7 @@ static void parse_one_short_opt_accept_without_arg() {
     args_free(args);
 }
 
-static void parse_one_short_opt_accept_with_arg() {
+static void parse_short_opt_accept_with_arg() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create("accept"));
@@ -61,7 +61,7 @@ static void parse_one_short_opt_accept_with_arg() {
     args_free(args);
 }
 
-static void parse_one_short_opt_require_without_arg() {
+static void parse_short_opt_accept_with_arg_no_space() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create("accept"));
@@ -89,7 +89,7 @@ static void parse_short_opt_require_without_arg() {
     args_free(args);
 }
 
-static void parse_one_short_opt_require_with_arg() {
+static void parse_short_opt_require_with_arg() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create("require"));
@@ -135,12 +135,12 @@ static void parse_short_opt_require_with_multiple_arg_no_space() {
     assert_true(opt->present);
 
     opt = option_find(args, "destroy");
-    assert_false(opt->present);
+    assert_true(opt->present);
 
     args_free(args);
 }
 
-static void parse_one_short_opt_require_with_double_dash() {
+static void parse_short_opt_require_with_double_dash() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create("require"));
@@ -152,7 +152,7 @@ static void parse_one_short_opt_require_with_double_dash() {
     args_free(args);
 }
 
-static void parse_one_long_opt() {
+static void parse_long_opt() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create(""));
@@ -165,7 +165,7 @@ static void parse_one_long_opt() {
     args_free(args);
 }
 
-static void parse_one_long_opt_disable() {
+static void parse_long_opt_enable() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create(""));
@@ -201,7 +201,7 @@ static void parse_long_opt_no() {
     args_free(args);
 }
 
-static void parse_one_long_opt_no() {
+static void parse_long_opt_with() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create(""));
@@ -298,7 +298,7 @@ static void parse_multiple_long_opt() {
     args_free(args);
 }
 
-static void parse_mixed_opt_parse() {
+static void parse_mixed_opt() {
     args *args = args_new();
 
     args_add_option(args, common_opt_create(""));
@@ -374,16 +374,16 @@ static void parse_mixed_opt_with_operands() {
 
 int main() {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(parse_one_short_opt),
-        cmocka_unit_test(parse_one_short_opt_negate),
-        cmocka_unit_test(parse_one_short_opt_accept_without_arg),
-        cmocka_unit_test(parse_one_short_opt_accept_with_arg),
-        cmocka_unit_test(parse_one_short_opt_require_without_arg),
-        cmocka_unit_test(parse_one_short_opt_require_with_arg),
-        cmocka_unit_test(parse_one_short_opt_require_with_double_dash),
-        cmocka_unit_test(parse_one_long_opt),
-        cmocka_unit_test(parse_one_long_opt_disable),
-        cmocka_unit_test(parse_one_long_opt_no),
+        cmocka_unit_test(parse_short_opt),
+        cmocka_unit_test(parse_short_opt_negate),
+        cmocka_unit_test(parse_short_opt_accept_without_arg),
+        cmocka_unit_test(parse_short_opt_accept_with_arg),
+        cmocka_unit_test(parse_short_opt_accept_with_arg_no_space),
+        cmocka_unit_test(parse_short_opt_require_without_arg),
+        cmocka_unit_test(parse_short_opt_require_with_arg),
+        cmocka_unit_test(parse_short_opt_require_with_arg_no_space),
+        cmocka_unit_test(parse_short_opt_require_with_multiple_arg_no_space),
+        cmocka_unit_test(parse_short_opt_require_with_double_dash),
         cmocka_unit_test(parse_long_opt),
         cmocka_unit_test(parse_long_opt_enable),
         cmocka_unit_test(parse_long_opt_disable),
@@ -394,7 +394,7 @@ int main() {
         cmocka_unit_test(parse_long_opt_arg_with_equals),
         cmocka_unit_test(parse_multiple_short_opt),
         cmocka_unit_test(parse_multiple_long_opt),
-        cmocka_unit_test(parse_mixed_opt_parse),
+        cmocka_unit_test(parse_mixed_opt),
         cmocka_unit_test(parse_mixed_opt_with_operands),
     };
 
