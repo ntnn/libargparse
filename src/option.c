@@ -40,7 +40,7 @@ void option_free(option *opt) {
     free(opt);
 }
 
-int option_help(option *opt, FILE *stream) {
+int option_help(const option *opt, FILE *stream) {
     fprintf(stream, "  ");
 
     if (opt->short_opt)
