@@ -37,6 +37,15 @@ static void option_find_success() {
     args_free(args);
 }
 
+static void option_find_failure() {
+    args *args = args_new();
+
+    args_add_option(args, common_opt_create(""));
+    assert_null(option_find(args, "d"));
+
+    args_free(args);
+}
+
 static void option_find_multiple() {
     args *args = args_new();
 
@@ -125,8 +134,8 @@ int main() {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(option_empty),
         cmocka_unit_test(option_find_success),
+        cmocka_unit_test(option_find_failure),
         cmocka_unit_test(option_find_multiple),
-        cmocka_unit_test(option_find_multiple_short_and_long),
         cmocka_unit_test(option_one_opt),
         cmocka_unit_test(option_empty_opt_fail),
         cmocka_unit_test(option_one_opt_with_arg),
