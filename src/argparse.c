@@ -31,7 +31,8 @@ int args_add_option(args *args, option *opt) {
     if (!args || !opt)
         return EXIT_FAILURE;
 
-    if (!opt->short_opt && !opt->long_opt)
+    if (strcmp("", opt->short_opt) == 0
+            && strcmp("", opt->long_opt) == 0)
         return EXIT_FAILURE;
 
     option *last = args->opts;
