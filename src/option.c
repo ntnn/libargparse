@@ -1,6 +1,10 @@
 #include "option.h"
 
-option *option_new() {
+option *option_new(
+        const char *short_opt,
+        const char *long_opt,
+        const char *description
+        ) {
     option *opt = NULL;
 
     opt = malloc(sizeof(option));
@@ -8,9 +12,9 @@ option *option_new() {
     if (!opt)
         return NULL;
 
-    opt->description = NULL;
-    opt->short_opt = NULL;
-    opt->long_opt = NULL;
+    opt->short_opt = short_opt;
+    opt->long_opt = long_opt;
+    opt->description = description;
 
     opt->argument = NULL;
     opt->accepts_arguments = false;

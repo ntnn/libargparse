@@ -74,8 +74,19 @@ args *args_new();
 /** Recursively free args struct. */
 void args_free(args *args);
 
-/** Initializer for option struct */
-option *option_new();
+/** Initializer for option struct
+ *
+ * \param short_opt Literal string with one char
+ * \param long_opt Literal string with multiple chars
+ * \param description Literal string describing what this option
+ *        influences
+ * \returns Pointer to the new option struct
+ */
+option *option_new(
+        const char *short_opt,
+        const char *long_opt,
+        const char *description
+        );
 
 /** Add an option to args struct
  *
