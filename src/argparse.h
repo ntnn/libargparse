@@ -43,9 +43,9 @@ typedef struct {
  *  description, short_opt and long_opt should be string literals.
  */
 typedef struct {
-    char *description; /** Description for help output */
-    char *short_opt; /** Short option, single char */
-    char *long_opt; /** Long option, multiple chars */
+    const char *description; /** Description for help output */
+    const char *short_opt; /** Short option, single char */
+    const char *long_opt; /** Long option, multiple chars */
 
     operand *argument; /** Argument for option, can be preset to a default */
     bool accepts_arguments; /** True if option accepts arguments */
