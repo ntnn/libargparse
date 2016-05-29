@@ -31,10 +31,10 @@ check_PROGRAMS = $(TESTS)
 CFLAGS += -lcmocka
 LDADD = libargparse.la
 
-tests_argparse_SOURCES = tests/argparse.c
-tests_operand_SOURCES = tests/operand.c
-tests_option_SOURCES = tests/option.c
-tests_parse_SOURCES = tests/parse.c
+tests_argparse_SOURCES = tests/common.c tests/argparse.c
+tests_operand_SOURCES = tests/common.c tests/operand.c
+tests_option_SOURCES = tests/common.c tests/option.c
+tests_parse_SOURCES = tests/common.c tests/parse.c
 endif
 
 examplesdir = examples
