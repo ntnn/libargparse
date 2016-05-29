@@ -39,8 +39,8 @@ endif
 
 examplesdir = examples
 examples_PROGRAMS = examples/echo
-examples_argparse_SOURCES = examples/echo.c
-examples_argparse_LDADD = libargparse.la
+examples_echo_SOURCES = examples/echo.c
+examples_echo_LDADD = libargparse.la
 
 @DX_RULES@
 
