@@ -5,6 +5,7 @@
 #include <cmocka.h>
 
 #include "argparse.h"
+#include "operand.h"
 
 static void operand_empty() {
     operand *operand = operand_new("");
