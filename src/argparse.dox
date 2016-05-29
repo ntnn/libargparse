@@ -23,6 +23,23 @@ The following arguments are all parsed into opt:
     * --with-feature
     * --without-feature
 
+Given `opt->accepts_arguments = true` or `opt->requires_arguments = true` arguments will be parsed in this manner:
+    * a positive prefix sets a positive opt->present, a negative sets negative
+    * a negative option-argument inverts opt->present
+
+Examples:
+    * -f -> positive present
+    * +f -> negative present
+    * -f=no -> negative present
+    * +f=no -> positive present
+    * --feature -> positive present
+    * --enable-feature -> positive present
+    * --with-feature=disable -> negative present
+    * --without-feature=true -> negative present
+    * --disable-feature true -> negative present
+
+A passend option-argument like "disable", "true", etc. pp. are still saved as the first option-argument.
+
 Argparse does not provide a way to `link` options as mutually exclusive
 or to set the same value. It is encouraged to make use of the
 functionality above, otherwise this logic has to be implemented
