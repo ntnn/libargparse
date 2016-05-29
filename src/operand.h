@@ -10,7 +10,7 @@
  * \param string string to parse into ->number or ->string
  * \returns pointer to operant struct
  */
-operand *operand_new(char *string);
+operand *operand_new(const char *string);
 
 /** Recursively frees an operand struct.
  * Unly useful if the operand to be free'd is not related to an option
@@ -29,6 +29,9 @@ void operand_free(operand *operand);
  * \param argument_delimiter delimiter to slice string with
  * \returns pointer to first item in list
  */
-operand *operand_parse(char *argument, char argument_delimiter);
+operand *operand_parse(
+        const char *argument,
+        const char argument_delimiter
+        );
 
 #endif // ARGPARSE_OPERAND_H

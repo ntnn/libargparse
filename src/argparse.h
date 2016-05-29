@@ -130,7 +130,7 @@ int args_add_operand(args *args, operand *op);
  * \param opt string identifying an option
  * \returns  option struct if option was found, NULL otherwise
  */
-option *option_find(args *args, char *opt);
+option *option_find(const args *args, const char *opt);
 
 /** Parses arguments into an args struct.
  *
@@ -143,7 +143,7 @@ option *option_find(args *args, char *opt);
  *             receive one
  *           EXIT_SUCCESS otherwise
  */
-int args_parse(args *args, size_t argc, char **argv);
+int args_parse(args *args, const size_t argc, const char **argv);
 
 /** Writes help generated from the args struct to the passed stream.
  *
@@ -156,6 +156,6 @@ int args_parse(args *args, size_t argc, char **argv);
  *           - an error occured during writing
  *           EXIT_SUCCESS otherwise
  */
-int args_help(args *args, FILE *stream);
+int args_help(const args *args, FILE *stream);
 
 #endif // ARGPARSE_ARGPARSE_H

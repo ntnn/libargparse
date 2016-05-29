@@ -1,6 +1,6 @@
 #include "operand.h"
 
-operand *operand_new(char *string) {
+operand *operand_new(const char *string) {
     operand *operand = NULL;
     operand = malloc(sizeof(operand));
 
@@ -25,7 +25,10 @@ void operand_free(operand *operand) {
     free(operand);
 }
 
-operand *operand_parse(char *argument, char argument_delimiter) {
+operand *operand_parse(
+        const char *argument,
+        const char argument_delimiter
+        ) {
     if (!argument)
         return NULL;
 

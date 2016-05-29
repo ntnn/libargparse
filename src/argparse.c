@@ -66,7 +66,7 @@ int args_add_operand(args *args, operand *op) {
     return EXIT_SUCCESS;
 }
 
-int args_help(args *args, FILE *stream) {
+int args_help(const args *args, FILE *stream) {
     if (!args || !stream || !args->opts)
         return EXIT_FAILURE;
 

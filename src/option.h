@@ -21,6 +21,6 @@ void option_free(option *opt);
  *          - error in fprintf
  *          EXIT_SUCCESS otherwise
  */
-int option_help(option *opt, FILE *stream);
+int option_help(const option *opt, FILE *stream);
 
 #endif // ARGPARSE_OPTION_H
