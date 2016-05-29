@@ -98,6 +98,15 @@ option *option_new(
  */
 int args_add_option(args *args, option *opt);
 
+/** Add an operand to args struct
+ *
+ *  \param args args structure to add operand to
+ *  \param op operand structure to add
+ *  \returns EXIT_FAILURE if args or op are NULL
+ *           EXIT_SUCCESS otherwise
+ */
+int args_add_operand(args *args, operand *op);
+
 /** Find option by short or long option.
  *
  * The option has to be passed as a string, short options are considered

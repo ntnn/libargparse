@@ -1,4 +1,6 @@
 #include "argparse.h"
+#include "option.h"
+#include "operand.h"
 
 args *args_new() {
     args *args = NULL;
@@ -42,6 +44,24 @@ int args_add_option(args *args, option *opt) {
         last->next = opt;
     } else
         args->opts = opt;
+
+    return EXIT_SUCCESS;
+}
+
+int args_add_operand(args *args, operand *op) {
+    if (!args || !op)
+        return EXIT_FAILURE;
+
+    operand *cur = args->operands;
+    if (!cur)
+        args->operands = op;
+    else {
+        while (cur->next)
+            cur = cur->next;
+        cur->next = op;
+    }
+
+    args->operandsc++;
 
     return EXIT_SUCCESS;
 }
