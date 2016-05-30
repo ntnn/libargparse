@@ -256,6 +256,22 @@ static void parse_long_opt_arg_with_equals() {
     args_free(args);
 }
 
+static void parse_long_opt_arg_accept_with_double_dash() {
+    args *args = args_new();
+
+    args_add_option(args, common_opt_create("accept"));
+    const char *arguments[] = { "--create", "--", "argument" };
+
+    assert_true(EXIT_SUCCESS == args_parse(args, 3, arguments));
+
+    option *opt = option_find(args, "create");
+    assert_true(opt->present);
+
+    assert_string_equal(args->operands->string, "argument");
+
+    args_free(args);
+}
+
 static void parse_multiple_short_opt() {
     args *args = args_new();
 
@@ -392,6 +408,7 @@ int main() {
         cmocka_unit_test(parse_long_opt_without),
         cmocka_unit_test(parse_long_opt_arg),
         cmocka_unit_test(parse_long_opt_arg_with_equals),
+        cmocka_unit_test(parse_long_opt_arg_accept_with_double_dash),
         cmocka_unit_test(parse_multiple_short_opt),
         cmocka_unit_test(parse_multiple_long_opt),
         cmocka_unit_test(parse_mixed_opt),

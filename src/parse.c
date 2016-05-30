@@ -148,8 +148,7 @@ int args_parse(args *args, const size_t argc, const char **argv) {
                 return EXIT_FAILURE;
             }
 
-            ++i;
-            if (i >= argc) {
+            if (i + 1 >= argc) {
                 if (opt->requires_arguments) {
                     // TODO error handling, option requires argument
                     // but none is given
@@ -161,7 +160,7 @@ int args_parse(args *args, const size_t argc, const char **argv) {
                 }
             }
 
-            if (strncmp(argv[i], "-", 1) == 0) {
+            if (strncmp(argv[i + 1], "-", 1) == 0) {
                 // next argument starts like an option
                 if (opt->requires_arguments) {
                     // TODO error handling, option requires argument
@@ -174,7 +173,7 @@ int args_parse(args *args, const size_t argc, const char **argv) {
                 }
             }
 
-            opt->argument = operand_parse(argv[i], opt->argument_delimiter);
+            opt->argument = operand_parse(argv[++i], opt->argument_delimiter);
         }
     }
 
