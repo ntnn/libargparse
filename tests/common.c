@@ -1,5 +1,21 @@
 #include "common.h"
 
+int common_setup(void **state) {
+    args *args = args_new();
+    if (!args)
+        return EXIT_FAILURE;
+
+    *state = args;
+
+    return EXIT_SUCCESS;
+}
+
+int common_teardown(void **state) {
+    args_free(*state);
+
+    return EXIT_SUCCESS;
+}
+
 option *common_option_wrapper(
         const char *shopt,
         const char *lopt,

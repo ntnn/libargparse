@@ -5,14 +5,13 @@
 #include <cmocka.h>
 
 #include "argparse.h"
+#include "common.h"
 
-static void args_empty() {
-    args *args = args_new();
+static void args_empty(void **state) {
+    args *args = *state;
 
     assert_null(args->opts);
     assert_null(args->operands);
-
-    args_free(args);
 }
 
 int main() {
@@ -20,5 +19,5 @@ int main() {
         cmocka_unit_test(args_empty),
     };
 
-    return cmocka_run_group_tests(tests, NULL, NULL);
+    return cmocka_run_group_tests(tests, common_setup, common_teardown);
 }

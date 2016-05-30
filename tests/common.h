@@ -9,6 +9,11 @@
 
 #include "argparse.h"
 
+/** Setup function storing pointer to args struct in state */
+int common_setup(void **state);
+/** Teardown function freeing args struct pointed to by state */
+int common_teardown(void **state);
+
 /** Wrapper to create options */
 option *common_option_wrapper(
         const char *shopt,
