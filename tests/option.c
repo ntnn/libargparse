@@ -1,13 +1,3 @@
-#include <stdlib.h>
-#include <stdarg.h>
-#include <setjmp.h>
-#define UNIT_TESTING 1
-#include <cmocka.h>
-
-#include "argparse.h"
-#include "option.h"
-#include "operand.h"
-#include "parse.h"
 #include "common.h"
 
 static void option_empty() {

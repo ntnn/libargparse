@@ -1,11 +1,5 @@
-#include <stdlib.h>
-#include <stdarg.h>
-#include <setjmp.h>
-#define UNIT_TESTING 1
-#include <cmocka.h>
-
-#include "argparse.h"
 #include "operand.h"
+#include "common.h"
 
 static void operand_empty() {
     operand *operand = operand_new("");
