@@ -1,4 +1,5 @@
 #include "common.h"
+#include "option.h"
 
 static void option_empty() {
     option *opt = option_new("", "", "");
