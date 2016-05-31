@@ -14,7 +14,7 @@ static void operand_wrapper(const char *string, const char *result[], const char
     size_t len = sizeof(result) / sizeof(result[0]);
 
     operand *cur = op;
-    for (int i = 0; i < len; ++i) {
+    for (size_t i = 0; i < len; ++i) {
         assert_non_null(result[i]);
 
         if (atoi(result[i])) {
