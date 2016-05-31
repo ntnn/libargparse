@@ -1,420 +1,335 @@
 #include "common.h"
 
-static void parse_short_opt() {
-    args *args = args_new();
+// for option_add_argument
+#include "option.h"
 
-    args_add_option(args, common_opt_create(""));
-    const char *arguments[1] = { "-c" };
+/** Parse tests.
+ *  argument_enable = true, yes, enable
+ *  argument_disable = false, no, disable
+ *  prefix_enable = enable, with
+ *  prefix_disable = no, disable, without
+ *
+ *  [-|+]f                              short_opt, short_opt_negate
+ *  [-|+]f argument                     short_opt_accepts, short_opt_requires
+ *  [-|+]fargument                      short_opt_arg_no_space
+ *  --feature                           long_opt
+ *  --feature argument                  long_opt_accepts, long_opt_requires
+ *  --feature=argument                  long_opt_arg_equals
+ *
+ *  --[prefix_mod-]feature              done with cpp dark magic
+ *  [-|+]f argument_mod                 done with cpp dark magic
+ *  --feature argument_mod              done with cpp dark magic
+ *  --[prefix_mod-]feature argument_mod done with cpp dark magic
+ */
 
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-    assert_true(option_find(args, "c")->present);
+static int parse_setup(void **state) {
+    args **arguments = malloc(sizeof(args*) * 2);
 
-    args_free(args);
+    arguments[0] = args_new();
+    if (!arguments[0])
+        return EXIT_FAILURE;
+
+    arguments[1] = args_new();
+    if (!arguments[1])
+        return EXIT_FAILURE;
+
+    *state = arguments;
+
+    return EXIT_SUCCESS;
 }
 
-static void parse_short_opt_negate() {
-    args *args = args_new();
+static int parse_teardown(void **state) {
+    args **arguments = *state;
 
-    args_add_option(args, common_opt_create(""));
-    const char *arguments[1] = { "+c" };
+    args_free(arguments[0]);
+    args_free(arguments[1]);
 
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-    assert_true(option_find(args, "c")->present < 0);
+    free(*state);
 
-    args_free(args);
+    return EXIT_SUCCESS;
 }
 
-static void parse_short_opt_accept_without_arg() {
-    args *args = args_new();
+static void compare_operand(operand *expected, operand *parsed) {
+    assert_non_null(expected);
+    assert_non_null(parsed);
 
-    args_add_option(args, common_opt_create("accept"));
-    const char *arguments[1] = { "-c" };
+    if (expected->number) {
+        assert_true(expected->number == parsed->number);
+        assert_null(expected->string);
+        assert_null(parsed->string);
+    } else {
+        assert_int_equal(0, parsed->number);
 
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-    assert_true(option_find(args, "c")->present);
+        assert_non_null(parsed->string);
+        assert_string_equal(
+                expected->string,
+                parsed->string
+                );
+    }
 
-    args_free(args);
+    if (expected->next)
+        compare_operand(expected->next, parsed->next);
 }
 
-static void parse_short_opt_accept_with_arg() {
-    args *args = args_new();
+static void compare_option(option *expected, option *parsed) {
+    assert_non_null(expected);
+    assert_non_null(parsed);
 
-    args_add_option(args, common_opt_create("accept"));
-    const char *arguments[2] = { "-c", "argument" };
+    assert_int_equal(expected->present, parsed->present);
+    assert_int_equal(expected->accepts_arguments, parsed->accepts_arguments);
+    assert_int_equal(expected->requires_arguments, parsed->requires_arguments);
 
-    assert_true(EXIT_SUCCESS == args_parse(args, 2, arguments));
+    if (expected->argument) {
+        assert_non_null(parsed->argument);
 
-    option *opt = option_find(args, "c");
-    assert_true(opt->present);
-    assert_string_equal("argument", opt->argument->string);
-
-    args_free(args);
+        compare_operand(
+                expected->argument,
+                parsed->argument
+                );
+    } else {
+        // expected operand has no argument, make sure the
+        // parsed operand didn't receive one either
+        assert_null(parsed->argument);
+    }
 }
 
-static void parse_short_opt_accept_with_arg_no_space() {
-    args *args = args_new();
+static void compare_args(args *expected, args *parsed) {
+    assert_non_null(expected);
+    assert_non_null(parsed);
 
-    args_add_option(args, common_opt_create("accept"));
+    assert_int_equal(expected->operandsc, parsed->operandsc);
 
-    const char *arguments[1] = { "-cargument" };
+    if (expected->opts) {
+        assert_non_null(parsed->opts);
+        assert_ptr_not_equal(expected->opts, parsed->opts);
 
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
+        option *curr = expected->opts;
 
-    option *opt = option_find(args, "c");
-    assert_true(opt->present);
-    assert_non_null(opt->argument);
-    assert_string_equal("argument", opt->argument->string);
+        while (curr) {
+            compare_option(
+                    curr,
+                    option_find(parsed, curr->long_opt)
+                    );
 
-    args_free(args);
+            curr = curr->next;
+        }
+    }
+
+    if (expected->operands) {
+        assert_non_null(parsed->operands);
+        assert_ptr_not_equal(expected->operands, parsed->operands);
+        compare_operand(expected->operands, parsed->operands);
+    }
 }
 
-static void parse_short_opt_require_without_arg() {
-    args *args = args_new();
+/** Small wrapper to avoid duplicated code in wrapper() */
+static void add_thing_to_args(args *args, void **things, int (*funcref)()) {
+    assert_non_null(args);
+    assert_non_null(funcref);
 
-    args_add_option(args, common_opt_create("require"));
-    const char *arguments[1] = { "-c" };
+    if (!things)
+        return;
 
-    assert_false(EXIT_SUCCESS == args_parse(args, 1, arguments));
-
-    args_free(args);
+    size_t len = sizeof(things) / sizeof(things[0]);
+    for (size_t i = 0; i < len; ++i) {
+        (*funcref)(args, things[i]);
+    }
 }
 
-static void parse_short_opt_require_with_arg() {
-    args *args = args_new();
+/** Wrapper function that assigns the referring options and operands
+ * lists to the expected and parsed args structs.
+ *
+ * Mainly for clarity, so the actual tests are readable.
+ *
+ * Arrays with the expected prefix are preset by the test functions and
+ * contain the exact values the test expects to be parsed.
+ *
+ * Arrays with the parsed prefix are copies of the expected arrays sans
+ * the preset values. These will be filled by args_parse() and then
+ * matched against the expected values.
+ */
+static void wrapper(
+        void **state,
+        option **expected_options,
+        operand **expected_operands,
+        option **parsed_options,
+        operand **parsed_operands,
+        const char **arguments,
+        const size_t argumentsc
+        ) {
+    args **states = *state;
+    args *expected = states[0];
+    args *parsed = states[1];
 
-    args_add_option(args, common_opt_create("require"));
+    add_thing_to_args(expected, (void **)expected_options, args_add_option);
+    add_thing_to_args(expected, (void **)expected_operands, args_add_operand);
+    add_thing_to_args(parsed, (void **)parsed_options, args_add_option);
+    add_thing_to_args(parsed, (void **)parsed_operands, args_add_operand);
 
-    const char *arguments[2] = { "-c", "argument" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 2, arguments));
-
-    assert_string_equal("argument",
-            option_find(args, "c")->argument->string);
-
-    args_free(args);
+    args_parse(
+            parsed,
+            argumentsc,
+            arguments
+            );
+    compare_args(expected, parsed);
 }
 
-static void parse_short_opt_require_with_arg_no_space() {
-    args *args = args_new();
+/** Macro to define two arrays at once without repetition.
+ *  TWO_ARRAYS(option, option_one, option_two, ...) result in:
+ *
+ *  type *expected_options[] = { option_one, option_two, ...};
+ *  type *parsed_options[] = { option_one, option_two, ...};
+ *
+ *  Within the tests the expected_##type##s arrays are then used to
+ *  define values that are expected to be parsed.
+ */
+#define TWO_ARRAYS(type, ...) type *expected_##type##s[] = { __VA_ARGS__ }; type *parsed_##type##s[] = { __VA_ARGS__ };
 
-    args_add_option(args, common_opt_create("require"));
-    const char *arguments[1] = { "-cargument" };
+#define LENGTH(array) sizeof(array) / sizeof(array[0])
 
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-    assert_string_equal("argument",
-            option_find(args, "c")->argument->string);
+#define OPT(length, value, accept_or_require, postfix, ...) \
+    static void length##_opt##postfix(void **state) { \
+        TWO_ARRAYS(option, \
+                common_opt_create(accept_or_require) \
+                ); \
+        \
+        const char *arguments[] = { __VA_ARGS__ }; \
+        expected_options[0]->present = value; \
+        if (sizeof(arguments) / sizeof(arguments[0]) > 1) \
+            option_add_argument(expected_options[0], operand_new(arguments[1])); \
+        \
+        wrapper(state, \
+                expected_options, \
+                NULL, \
+                parsed_options, \
+                NULL, \
+                arguments, \
+                sizeof(arguments) / sizeof(arguments[0]) \
+                ); \
+    }
 
-    args_free(args);
+// short_opt
+OPT(short, 1, "", , "-c")
+// short_opt_negate
+OPT(short, -1, "", _negate, "+c")
+// long_opt
+OPT(long, 1, "", , "--create")
+
+// short_opt_accepts
+OPT(short, 1, "accept", _accepts, "-c", "argument")
+// long_opt_accepts
+OPT(long, 1, "accept", _accepts, "--create", "argument")
+
+// short_opt_requires
+OPT(short, 1, "require", _requires, "-c", "argument")
+// long_opt_requires
+OPT(long, 1, "require", _requires, "--create", "argument")
+
+static void short_opt_arg_no_space(void **state) {
+    TWO_ARRAYS(option,
+            common_opt_create("accept"),
+            );
+
+    expected_options[0]->present = 1;
+    option_add_argument(expected_options[0], operand_new("argument"));
+
+    const char *arguments[] = { "-cargument" };
+
+    wrapper(state, expected_options, NULL, parsed_options, NULL, arguments, 1);
 }
 
-static void parse_short_opt_require_with_multiple_arg_no_space() {
-    args *args = args_new();
+static void long_opt_arg_equals(void **state) {
+    TWO_ARRAYS(option,
+            common_opt_create("accept"),
+            );
 
-    args_add_option(args, common_opt_create("require"));
-    args_add_option(args, common_opt_zero(""));
-    args_add_option(args, common_opt_destroy(""));
-    const char *arguments[1] = { "-0cargument" };
+    expected_options[0]->present = 1;
+    option_add_argument(expected_options[0], operand_new("argument"));
+    const char *arguments[] = { "--create=argument" };
 
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-
-    option *opt = option_find(args, "c");
-    assert_true(opt->present);
-    assert_string_equal("argument", opt->argument->string);
-
-    opt = option_find(args, "zero");
-    assert_true(opt->present);
-
-    opt = option_find(args, "destroy");
-    assert_false(opt->present);
-
-    args_free(args);
+    wrapper(state, expected_options, NULL, parsed_options, NULL, arguments, 1);
 }
 
-static void parse_short_opt_require_with_double_dash() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create("require"));
-
-    const char *arguments[3] = { "-c", "--", "operand" };
-
-    assert_true(EXIT_FAILURE == args_parse(args, 3, arguments));
-
-    args_free(args);
-}
-
-static void parse_long_opt() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create(""));
-
-    const char *arguments[1] = { "--create" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-    assert_true(option_find(args, "create")->present);
-
-    args_free(args);
-}
-
-static void parse_long_opt_enable() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create(""));
-    const char *arguments[1] = { "--enable-create" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-    assert_true(option_find(args, "create")->present > 0);
-
-    args_free(args);
-}
-
-static void parse_long_opt_disable() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create(""));
-    const char *arguments[1] = { "--disable-create" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-    assert_true(option_find(args, "create")->present < 0);
-
-    args_free(args);
-}
-
-static void parse_long_opt_no() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create(""));
-    const char *arguments[1] = { "--no-create" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-    assert_true(option_find(args, "create")->present < 0);
-
-    args_free(args);
-}
-
-static void parse_long_opt_with() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create(""));
-    const char *arguments[1] = { "--with-create" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-    assert_true(option_find(args, "create")->present > 0);
-
-    args_free(args);
-}
-
-static void parse_long_opt_without() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create(""));
-    const char *arguments[1] = { "--without-create" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-    assert_true(option_find(args, "create")->present < 0);
-
-    args_free(args);
-}
-
-static void parse_long_opt_arg() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create("accept"));
-    const char *arguments[2] = { "--create", "argument" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 2, arguments));
-
-    option *opt = option_find(args, "create");
-    assert_true(opt->present);
-    assert_string_equal(opt->argument->string, "argument");
-
-    args_free(args);
-}
-
-static void parse_long_opt_arg_with_equals() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create("accept"));
-    const char *arguments[1] = { "--create=argument" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 1, arguments));
-
-    option *opt = option_find(args, "create");
-    assert_true(opt->present);
-    assert_non_null(opt->argument);
-    assert_string_equal(opt->argument->string, "argument");
-
-    args_free(args);
-}
-
-static void parse_long_opt_arg_accept_with_double_dash() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create("accept"));
-    const char *arguments[] = { "--create", "--", "argument" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 3, arguments));
-
-    option *opt = option_find(args, "create");
-    assert_true(opt->present);
-
-    assert_string_equal(args->operands->string, "argument");
-
-    args_free(args);
-}
-
-static void parse_long_opt_arg_require() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create("require"));
-    const char *arguments[] = { "--create", "--", "argument" };
-
-    assert_false(EXIT_SUCCESS == args_parse(args, 3, arguments));
-
-    args_free(args);
-}
-
-static void parse_multiple_short_opt() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create(""));
-    args_add_option(args, common_opt_xor(""));
-    args_add_option(args, common_opt_zero(""));
-    args_add_option(args, common_opt_append(""));
-    args_add_option(args, common_opt_destroy(""));
-
-    const char *arguments[3] = { "-cx", "-a", "-0" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 3, arguments));
-    assert_true(option_find(args, "c")->present);
-    assert_true(option_find(args, "x")->present);
-    assert_true(option_find(args, "0")->present);
-    assert_true(option_find(args, "a")->present);
-    assert_false(option_find(args, "d")->present);
-
-    args_free(args);
-}
-
-static void parse_multiple_long_opt() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create(""));
-    args_add_option(args, common_opt_xor(""));
-    args_add_option(args, common_opt_zero(""));
-    args_add_option(args, common_opt_append(""));
-    args_add_option(args, common_opt_destroy(""));
-
-    const char *arguments[3] = { "--create", "--destroy", "--zero" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 3, arguments));
-    assert_true(option_find(args, "create")->present);
-    assert_false(option_find(args, "xor")->present);
-    assert_true(option_find(args, "zero")->present);
-    assert_false(option_find(args, "append")->present);
-    assert_true(option_find(args, "destroy")->present);
-
-    args_free(args);
-}
-
-static void parse_mixed_opt() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create(""));
-    args_add_option(args, common_opt_xor(""));
-    args_add_option(args, common_opt_zero(""));
-    args_add_option(args, common_opt_append(""));
-    args_add_option(args, common_opt_destroy(""));
-
-    const char *arguments[3] = { "-cx", "--append", "-0" };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 3, arguments));
-    assert_true(option_find(args, "create")->present);
-    assert_true(option_find(args, "xor")->present);
-    assert_true(option_find(args, "zero")->present);
-    assert_true(option_find(args, "append")->present);
-    assert_false(option_find(args, "destroy")->present);
-
-    args_free(args);
-}
-
-static void parse_mixed_opt_with_operands() {
-    args *args = args_new();
-
-    args_add_option(args, common_opt_create(""));
-    args_add_option(args, common_opt_xor(""));
-    args_add_option(args, common_opt_zero("accept"));
-    args_add_option(args, common_opt_append("accept"));
-    args_add_option(args, common_opt_destroy(""));
-
-    const char *arguments[7] = {
-        "+cx",
-        "--append",
-        "an_argument",
-        "-0",
-        "some:thing:",
-        "50",
-        "operand",
-    };
-
-    assert_true(EXIT_SUCCESS == args_parse(args, 7, arguments));
-    assert_true(option_find(args, "create")->present < 0);
-    assert_true(option_find(args, "xor")->present < 0);
-
-    option *zero = option_find(args, "zero");
-    assert_true(zero->present);
-    assert_non_null(zero->argument);
-    assert_string_equal("some", zero->argument->string);
-
-    assert_non_null(zero->argument->next);
-    operand *next = zero->argument->next;
-    assert_string_equal("thing", next->string);
-
-    assert_non_null(next->next);
-    next = next->next;
-    assert_string_equal("", next->string);
-
-    option *append = option_find(args, "append");
-    assert_true(append->present);
-    assert_non_null(append->argument);
-    assert_string_equal("an_argument", append->argument->string);
-
-    assert_false(option_find(args, "destroy")->present);
-
-    operand *op = args->operands;
-    assert_true(op->number == 50);
-
-    op = op->next;
-    assert_string_equal(op->string, "operand");
-    assert_null(op->next);
-
-    args_free(args);
-}
+ /** Preprocessor voodoo
+  *  argument_enable = true, yes, enable
+  *  argument_disable = false, no, disable
+  *  prefix_enable = enable, with
+  *  prefix_disable = no, disable, without
+  */
+
+#undef true
+#undef false
+/* #define CONCAT(a, b) a#b */
+
+/** Generates functions in the pattern
+ *      [short|long]_opt_mod_[argument_modifier]_[positive|negative]
+ *       |                    |                   +- depends on the passed value
+ *       |                    +- true, yes, enable, false, no , disable
+ *       +- -c or --create
+ */
+#define OPT_MOD(length, arg, funcpostfix, prefix, modifier, value) \
+        static void length##_opt_mod_##modifier##_##funcpostfix(void **state) { \
+            LOG("argument: %s, modifier: %s, expected value: %d", prefix#arg, #modifier, value); \
+            TWO_ARRAYS(option, common_opt_create("accept")); \
+            expected_options[0]->present = value; \
+            option_add_argument(expected_options[0], operand_new(#modifier)); \
+            const char *arguments[] = { prefix#arg, #modifier }; \
+            wrapper(state, expected_options, NULL, parsed_options, NULL, arguments, 2); \
+        }
+
+#define BOTH_OPT_MOD(modifier, value) \
+    OPT_MOD(short, c, positive, "-", modifier, value) \
+    OPT_MOD(short, c, negative, "+", modifier, -value) \
+    OPT_MOD(long, create, enable, "--enable-", modifier, value) \
+    OPT_MOD(long, create, with, "--with-", modifier, value) \
+    OPT_MOD(long, create, no, "--no-", modifier, -value) \
+    OPT_MOD(long, create, disable, "--disable-", modifier, -value) \
+    OPT_MOD(long, create, without, "--without=", modifier, -value)
+
+BOTH_OPT_MOD(true, 1)
+BOTH_OPT_MOD(yes, 1)
+BOTH_OPT_MOD(enable, 1)
+
+BOTH_OPT_MOD(false, -1)
+BOTH_OPT_MOD(no, -1)
+BOTH_OPT_MOD(disable, -1)
 
 int main() {
+    #define TEST(test) cmocka_unit_test_setup_teardown(test, parse_setup, parse_teardown)
+
+    #define TEST_OPT_MOD(modifier) \
+        TEST(short_opt_mod_##modifier##_positive), \
+        TEST(short_opt_mod_##modifier##_negative), \
+        TEST(long_opt_mod_##modifier##_enable), \
+        TEST(long_opt_mod_##modifier##_with), \
+        TEST(long_opt_mod_##modifier##_no), \
+        TEST(long_opt_mod_##modifier##_disable), \
+        TEST(long_opt_mod_##modifier##_without),
+
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(parse_short_opt),
-        cmocka_unit_test(parse_short_opt_negate),
-        cmocka_unit_test(parse_short_opt_accept_without_arg),
-        cmocka_unit_test(parse_short_opt_accept_with_arg),
-        cmocka_unit_test(parse_short_opt_accept_with_arg_no_space),
-        cmocka_unit_test(parse_short_opt_require_without_arg),
-        cmocka_unit_test(parse_short_opt_require_with_arg),
-        cmocka_unit_test(parse_short_opt_require_with_arg_no_space),
-        cmocka_unit_test(parse_short_opt_require_with_multiple_arg_no_space),
-        cmocka_unit_test(parse_short_opt_require_with_double_dash),
-        cmocka_unit_test(parse_long_opt),
-        cmocka_unit_test(parse_long_opt_enable),
-        cmocka_unit_test(parse_long_opt_disable),
-        cmocka_unit_test(parse_long_opt_no),
-        cmocka_unit_test(parse_long_opt_with),
-        cmocka_unit_test(parse_long_opt_without),
-        cmocka_unit_test(parse_long_opt_arg),
-        cmocka_unit_test(parse_long_opt_arg_with_equals),
-        cmocka_unit_test(parse_long_opt_arg_accept_with_double_dash),
-        cmocka_unit_test(parse_long_opt_arg_require),
-        cmocka_unit_test(parse_multiple_short_opt),
-        cmocka_unit_test(parse_multiple_long_opt),
-        cmocka_unit_test(parse_mixed_opt),
-        cmocka_unit_test(parse_mixed_opt_with_operands),
+
+        TEST(short_opt),
+        TEST(long_opt),
+
+        TEST(short_opt_negate),
+
+        TEST(short_opt_accepts),
+        TEST(long_opt_accepts),
+
+        TEST(short_opt_requires),
+        TEST(long_opt_requires),
+
+        TEST(short_opt_arg_no_space),
+        TEST(long_opt_arg_equals),
+
+        TEST_OPT_MOD(true)
+        TEST_OPT_MOD(yes)
+        TEST_OPT_MOD(enable)
+
+        TEST_OPT_MOD(false)
+        TEST_OPT_MOD(no)
+        TEST_OPT_MOD(disable)
+
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
