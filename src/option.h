@@ -3,6 +3,7 @@
 
 #include "argparse.h"
 #include "operand.h"
+#include "logger.h"
 
 /** Recursively frees an option struct.
  * Only useful if the option to be free'd is not related to an args

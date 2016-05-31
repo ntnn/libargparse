@@ -4,6 +4,7 @@
 #include "argparse.h"
 #include "option.h"
 #include "operand.h"
+#include "logger.h"
 
 /** Parses an arbitrary number of short options in the form of '-abcde'.
  *
