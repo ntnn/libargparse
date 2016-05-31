@@ -24,9 +24,9 @@ option *common_option_wrapper(
         ) {
     option *opt = option_new(shopt, lopt, descr);
 
-    if (strcmp(accept_require, "accept") == 0)
+    if (strncmp(accept_require, "accept", 6) == 0)
         opt->accepts_arguments = true;
-    else if (strcmp(accept_require, "require") == 0)
+    else if (strncmp(accept_require, "require", 7) == 0)
         opt->requires_arguments = true;
 
     return opt;
