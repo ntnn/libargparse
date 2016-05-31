@@ -85,9 +85,25 @@ int option_add_argument(option *opt, operand *op) {
         return EXIT_FAILURE;
 
     operand *cur = opt->argument;
-    if (!cur)
+    if (!cur) {
         opt->argument = op;
-    else {
+
+        // check for modifiers, since this is the first option-argument
+        // to be added to the option
+        char *modifiers[] = {
+            "false",
+            "no",
+            "disable"
+        };
+
+        for (size_t i = 0; i < LENGTH(modifiers); ++i) {
+            if (strcmp(op->string, modifiers[i]) == 0) {
+                LOG("found modifier %s, flipping %d", modifiers[i], opt->present);
+                opt->present *= -1;
+                break;
+            }
+        }
+    } else {
         while (cur->next)
             cur = cur->next;
         cur->next = op;
