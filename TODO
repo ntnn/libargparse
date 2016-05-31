@@ -3,8 +3,3 @@ general:
 - subcommands
 - help output
 - parseable subcommand, option, etc.pp. output for completions
-
-options:
-- short_opt's with no space between option and option-argument
-- long_opt's with an equal sign instead of space between option and
-  option-argument
