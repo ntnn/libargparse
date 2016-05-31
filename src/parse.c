@@ -113,7 +113,7 @@ option *parse_long(args *args, const char *argument) {
     return NULL;
 }
 
-int args_parse(args *args, const size_t argc, const char **argv) {
+int args_parse(args *args, const size_t argc, const char **const argv) {
     for (size_t i = 0; i < argc; ++i) {
         option *opt = NULL;
         const char *argument = argv[i];

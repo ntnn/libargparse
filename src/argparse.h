@@ -143,7 +143,7 @@ option *option_find(const args *args, const char *opt);
  *             receive one
  *           EXIT_SUCCESS otherwise
  */
-int args_parse(args *args, const size_t argc, const char **argv);
+int args_parse(args *args, const size_t argc, const char **const argv);
 
 /** Writes help generated from the args struct to the passed stream.
  *
