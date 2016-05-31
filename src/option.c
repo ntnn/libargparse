@@ -40,7 +40,7 @@ void option_free(option *opt) {
     free(opt);
 }
 
-int option_help(const option *opt, FILE *stream) {
+ARGPARSEcode option_help(const option *opt, FILE *stream) {
     fprintf(stream, "  ");
 
     if (opt->short_opt)
@@ -52,8 +52,8 @@ int option_help(const option *opt, FILE *stream) {
     if (opt->description)
         fprintf(stream, "\t%s", opt->description);
 
-    printf("\n");
-    return EXIT_SUCCESS;
+    fprintf(stream, "\n");
+    return ARGPARSE_OK;
 }
 
 option *option_find(const args *args, const char *opt) {
@@ -80,9 +80,9 @@ option *option_find(const args *args, const char *opt) {
     return NULL;
 }
 
-int option_add_argument(option *opt, operand *op) {
+ARGPARSEcode option_add_argument(option *opt, operand *op) {
     if (!opt || !op)
-        return EXIT_FAILURE;
+        return ARGPARSE_PASSED_NULL;
 
     operand *cur = opt->argument;
     if (!cur) {
@@ -109,5 +109,5 @@ int option_add_argument(option *opt, operand *op) {
         cur->next = op;
     }
 
-    return EXIT_SUCCESS;
+    return ARGPARSE_OK;
 }

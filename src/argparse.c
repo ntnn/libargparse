@@ -29,13 +29,13 @@ void args_free(args *args) {
     free(args);
 }
 
-int args_add_option(args *args, option *opt) {
+ARGPARSEcode args_add_option(args *args, option *opt) {
     if (!args || !opt)
-        return EXIT_FAILURE;
+        return ARGPARSE_PASSED_NULL;
 
     if (strcmp("", opt->short_opt) == 0
             && strcmp("", opt->long_opt) == 0)
-        return EXIT_FAILURE;
+        return ARGPARSE_EMPTY_OPTION;
 
     option *last = args->opts;
     if (last != NULL) {
@@ -45,12 +45,12 @@ int args_add_option(args *args, option *opt) {
     } else
         args->opts = opt;
 
-    return EXIT_SUCCESS;
+    return ARGPARSE_OK;
 }
 
-int args_add_operand(args *args, operand *op) {
+ARGPARSEcode args_add_operand(args *args, operand *op) {
     if (!args || !op)
-        return EXIT_FAILURE;
+        return ARGPARSE_PASSED_NULL;
 
     operand *cur = args->operands;
     if (!cur)
@@ -63,18 +63,22 @@ int args_add_operand(args *args, operand *op) {
 
     args->operandsc++;
 
-    return EXIT_SUCCESS;
+    return ARGPARSE_OK;
 }
 
-int args_help(const args *args, FILE *stream) {
-    if (!args || !stream || !args->opts)
-        return EXIT_FAILURE;
+ARGPARSEcode args_help(const args *args, FILE *stream) {
+    if (!args || !stream)
+        return ARGPARSE_PASSED_NULL;
 
     option *opt = args->opts;
     while (opt) {
-        option_help(opt, stream);
+        ARGPARSEcode ret = option_help(opt, stream);
+
+        if (ret)
+            return ret;
+
         opt = opt->next;
     }
 
-    return EXIT_SUCCESS;
+    return ARGPARSE_OK;
 }

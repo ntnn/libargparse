@@ -113,7 +113,10 @@ option *parse_long(args *args, const char *argument) {
     return NULL;
 }
 
-int args_parse(args *args, const size_t argc, const char **const argv) {
+ARGPARSEcode args_parse(args *args, const size_t argc, const char **const argv) {
+    if (!args || !argv)
+        return ARGPARSE_PASSED_NULL;
+
     for (size_t i = 0; i < argc; ++i) {
         option *opt = NULL;
         const char *argument = argv[i];
@@ -126,7 +129,7 @@ int args_parse(args *args, const size_t argc, const char **const argv) {
                         );
             }
 
-            return EXIT_SUCCESS;
+            return ARGPARSE_OK;
         } else if (strncmp(argument, "--", 2) == 0) {
             opt = parse_long(args, argument);
         } else if (
@@ -143,29 +146,27 @@ int args_parse(args *args, const size_t argc, const char **const argv) {
 
         if (opt) {
             if (!opt->accepts_arguments && !opt->requires_arguments) {
-                // TODO error handling, opt was returned even though it
-                // doesn't accept nor require arguments
-                return EXIT_FAILURE;
+                // opt was returned even though it doesn't accept nor
+                // require arguments
+                return ARGPARSE_FALSE_RETURN;
             }
 
             if (i + 1 >= argc) {
                 if (opt->requires_arguments) {
-                    // TODO error handling, option requires argument
-                    // but none is given
-                    return EXIT_FAILURE;
+                    // option requires argument but none is given
+                    return ARGPARSE_ARG_REQUIRED;
                 } else if (opt->accepts_arguments) {
                     // last option, option accepts arguments and
                     // none is given, return success
-                    return EXIT_SUCCESS;
+                    return ARGPARSE_OK;
                 }
             }
 
             if (strncmp(argv[i + 1], "-", 1) == 0) {
                 // next argument starts like an option
                 if (opt->requires_arguments) {
-                    // TODO error handling, option requires argument
-                    // but next is option
-                    return EXIT_FAILURE;
+                    // option requires argument but next is option
+                    return ARGPARSE_ARG_REQUIRED;
                 } else if (opt->accepts_arguments) {
                     // option accepts argument but none is given,
                     // continue
@@ -177,5 +178,5 @@ int args_parse(args *args, const size_t argc, const char **const argv) {
         }
     }
 
-    return EXIT_SUCCESS;
+    return ARGPARSE_OK;
 }

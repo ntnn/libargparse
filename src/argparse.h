@@ -68,6 +68,17 @@ typedef struct {
     operand *operands; /** Operands */
 } args;
 
+/** Return codes for argparse functions.
+ * String representations can be obtained via args_error()
+ */
+typedef enum {
+    ARGPARSE_OK = 0,
+    ARGPARSE_PASSED_NULL, /** Null pointer passed to function that requires a valid pointer */
+    ARGPARSE_EMPTY_OPTION, /** Passed option's short_opt and long_opt are empty */
+    ARGPARSE_FALSE_RETURN, /** An unexpected value was returned */
+    ARGPARSE_ARG_REQUIRED, /** An option-argument is required but none was supplied */
+} ARGPARSEcode;
+
 /** Initializer for args struct. */
 args *args_new();
 
@@ -92,20 +103,17 @@ option *option_new(
  *
  *  \param args args structure to add option to
  *  \param opt option structure to add
- *  \returns EXIT_FAILURE if args or opt are NULL and if short_opt and
- *           long_opt are NULL
- *           EXIT_SUCCESS otherwise
+ *  \returns ARGPARSEcode
  */
-int args_add_option(args *args, option *opt);
+ARGPARSEcode args_add_option(args *args, option *opt);
 
 /** Add an operand to args struct
  *
  *  \param args args structure to add operand to
  *  \param op operand structure to add
- *  \returns EXIT_FAILURE if args or op are NULL
- *           EXIT_SUCCESS otherwise
+ *  \returns ARGPARSEcode
  */
-int args_add_operand(args *args, operand *op);
+ARGPARSEcode args_add_operand(args *args, operand *op);
 
 /** Find option by short or long option.
  *
@@ -138,24 +146,16 @@ option *option_find(const args *args, const char *opt);
  *  \param argc count of elements in argv
  *  \param argv pointer to char array of options, option-argument and
  *              operands
- *  \returns EXIT_FAILURE if an error occured, such as:
- *           - an option which required an option-argument didn't
- *             receive one
- *           EXIT_SUCCESS otherwise
+ *  \returns ARGPARSEcode
  */
-int args_parse(args *args, const size_t argc, const char **const argv);
+ARGPARSEcode args_parse(args *args, const size_t argc, const char **const argv);
 
 /** Writes help generated from the args struct to the passed stream.
  *
  *  \param args args struct to generate help from
  *  \param stream stream to write to
- *  \returns EXIT_FAILURE if:
- *           - args or stream are NULL,
- *           - args contains no options
- *           - an error occurred during generating the help
- *           - an error occured during writing
- *           EXIT_SUCCESS otherwise
+ *  \returns ARGPARSEcode
  */
-int args_help(const args *args, FILE *stream);
+ARGPARSEcode args_help(const args *args, FILE *stream);
 
 #endif // ARGPARSE_ARGPARSE_H

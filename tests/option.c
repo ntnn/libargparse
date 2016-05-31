@@ -67,15 +67,6 @@ static void option_one_opt() {
     args_free(args);
 }
 
-static void option_empty_opt_fail() {
-    args *args = args_new();
-
-    option *opt = option_new("", "", "");
-    assert_true(EXIT_FAILURE == args_add_option(args, opt));
-
-    args_free(args);
-}
-
 static void option_one_opt_with_arg() {
     args *args = args_new();
     option *opt = common_opt_create("");
@@ -128,7 +119,6 @@ int main() {
         cmocka_unit_test(option_find_failure),
         cmocka_unit_test(option_find_multiple),
         cmocka_unit_test(option_one_opt),
-        cmocka_unit_test(option_empty_opt_fail),
         cmocka_unit_test(option_one_opt_with_arg),
         cmocka_unit_test(option_multiple_options),
     };

@@ -128,16 +128,16 @@ static void compare_args(args *expected, args *parsed) {
 }
 
 /** Small wrapper to avoid duplicated code in wrapper() */
-static void add_thing_to_args(args *args, void **things, int (*funcref)()) {
+static void add_thing_to_args(args *args, void **things, ARGPARSEcode (*funcref)()) {
     assert_non_null(args);
     assert_non_null(funcref);
 
     if (!things)
         return;
 
-    size_t len = sizeof(things) / sizeof(things[0]);
+    size_t len = LENGTH(things);
     for (size_t i = 0; i < len; ++i) {
-        (*funcref)(args, things[i]);
+        assert_int_equal(ARGPARSE_OK, (*funcref)(args, things[i]));
     }
 }
 
@@ -190,8 +190,6 @@ static void wrapper(
  */
 #define TWO_ARRAYS(type, ...) type *expected_##type##s[] = { __VA_ARGS__ }; type *parsed_##type##s[] = { __VA_ARGS__ };
 
-#define LENGTH(array) sizeof(array) / sizeof(array[0])
-
 #define OPT(length, value, accept_or_require, postfix, ...) \
     static void length##_opt##postfix(void **state) { \
         TWO_ARRAYS(option, \
@@ -200,8 +198,11 @@ static void wrapper(
         \
         const char *arguments[] = { __VA_ARGS__ }; \
         expected_options[0]->present = value; \
-        if (sizeof(arguments) / sizeof(arguments[0]) > 1) \
-            option_add_argument(expected_options[0], operand_new(arguments[1])); \
+        if (LENGTH(arguments) > 1) \
+            assert_int_equal( \
+                    ARGPARSE_OK, \
+                    option_add_argument(expected_options[0], operand_new(arguments[1])) \
+                    ); \
         \
         wrapper(state, \
                 expected_options, \
@@ -209,7 +210,7 @@ static void wrapper(
                 parsed_options, \
                 NULL, \
                 arguments, \
-                sizeof(arguments) / sizeof(arguments[0]) \
+                LENGTH(arguments) \
                 ); \
     }
 
@@ -236,7 +237,10 @@ static void short_opt_arg_no_space(void **state) {
             );
 
     expected_options[0]->present = 1;
-    option_add_argument(expected_options[0], operand_new("argument"));
+    assert_int_equal(
+            ARGPARSE_OK,
+            option_add_argument(expected_options[0], operand_new("argument"))
+            );
 
     const char *arguments[] = { "-cargument" };
 
@@ -249,7 +253,10 @@ static void long_opt_arg_equals(void **state) {
             );
 
     expected_options[0]->present = 1;
-    option_add_argument(expected_options[0], operand_new("argument"));
+    assert_int_equal(
+            ARGPARSE_OK,
+            option_add_argument(expected_options[0], operand_new("argument"))
+            );
     const char *arguments[] = { "--create=argument" };
 
     wrapper(state, expected_options, NULL, parsed_options, NULL, arguments, 1);
@@ -277,7 +284,10 @@ static void long_opt_arg_equals(void **state) {
             LOG("argument: %s, modifier: %s, expected value: %d", prefix#arg, #modifier, value); \
             TWO_ARRAYS(option, common_opt_create("accept")); \
             expected_options[0]->present = value; \
-            option_add_argument(expected_options[0], operand_new(#modifier)); \
+            assert_int_equal( \
+                    ARGPARSE_OK, \
+                    option_add_argument(expected_options[0], operand_new(#modifier)) \
+                    ); \
             const char *arguments[] = { prefix#arg, #modifier }; \
             wrapper(state, expected_options, NULL, parsed_options, NULL, arguments, 2); \
         }
