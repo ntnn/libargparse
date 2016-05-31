@@ -8,6 +8,7 @@
 #include <cmocka.h>
 
 #include "argparse.h"
+#include "logger.h"
 
 /** Setup function storing pointer to args struct in state */
 int common_setup(void **state);
