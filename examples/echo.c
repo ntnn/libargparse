@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(size_t argc, char **argv) {
+int main(int argc, char **argv) {
     args *args = args_new();
     if (!args) {
         fprintf(stderr, "argparse could not be initialized, aborting.\n");
