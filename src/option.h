@@ -2,8 +2,9 @@
 #define ARGPARSE_OPTION_H
 
 #include "argparse.h"
+#include "argparse_private.h"
+
 #include "operand.h"
-#include "logger.h"
 
 /** Recursively frees an option struct.
  * Only useful if the option to be free'd is not related to an args

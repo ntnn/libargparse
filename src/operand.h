@@ -2,6 +2,7 @@
 #define ARGPARSE_OPERAND_H
 
 #include "argparse.h"
+#include "argparse_private.h"
 
 /** Initializes an operand struct with a string.
  * You probably want to use operand_parse to slice the operand into

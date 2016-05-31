@@ -2,9 +2,10 @@
 #define ARGPARSE_PARSE_H
 
 #include "argparse.h"
+#include "argparse_private.h"
+
 #include "option.h"
 #include "operand.h"
-#include "logger.h"
 
 /** Parses an arbitrary number of short options in the form of '-abcde'.
  *
