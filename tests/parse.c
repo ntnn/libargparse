@@ -26,12 +26,17 @@ static int parse_setup(void **state) {
     args **arguments = malloc(sizeof(args*) * 2);
 
     arguments[0] = args_new();
-    if (!arguments[0])
+    if (!arguments[0]) {
+        free(arguments);
         return EXIT_FAILURE;
+    }
 
     arguments[1] = args_new();
-    if (!arguments[1])
+    if (!arguments[1]) {
+        free_args(arguments[0]);
+        free(arguments);
         return EXIT_FAILURE;
+    }
 
     *state = arguments;
 
