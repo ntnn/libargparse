@@ -113,7 +113,7 @@ option *parse_long(args *args, const char *argument) {
     return NULL;
 }
 
-ARGPARSEcode args_parse(args *args, const size_t argc, const char **const argv) {
+ARGPARSEcode args_parse(args *args, const size_t argc, char **argv) {
     if (!args || !argv)
         return ARGPARSE_PASSED_NULL;
 

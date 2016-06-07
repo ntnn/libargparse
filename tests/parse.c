@@ -159,8 +159,8 @@ static void wrapper(
         operand **expected_operands,
         option **parsed_options,
         operand **parsed_operands,
-        const char **arguments,
-        const size_t argumentsc
+        char **arguments,
+        size_t argumentsc
         ) {
     args **states = *state;
     args *expected = states[0];
@@ -196,7 +196,7 @@ static void wrapper(
                 common_opt_create(accept_or_require) \
                 ); \
         \
-        const char *arguments[] = { __VA_ARGS__ }; \
+        char *arguments[] = { __VA_ARGS__ }; \
         expected_options[0]->present = value; \
         if (LENGTH(arguments) > 1) \
             assert_int_equal( \
@@ -242,7 +242,7 @@ static void short_opt_arg_no_space(void **state) {
             option_add_argument(expected_options[0], operand_new("argument"))
             );
 
-    const char *arguments[] = { "-cargument" };
+    char *arguments[] = { "-cargument" };
 
     wrapper(state, expected_options, NULL, parsed_options, NULL, arguments, 1);
 }
@@ -257,7 +257,7 @@ static void long_opt_arg_equals(void **state) {
             ARGPARSE_OK,
             option_add_argument(expected_options[0], operand_new("argument"))
             );
-    const char *arguments[] = { "--create=argument" };
+    char *arguments[] = { "--create=argument" };
 
     wrapper(state, expected_options, NULL, parsed_options, NULL, arguments, 1);
 }
@@ -288,7 +288,7 @@ static void long_opt_arg_equals(void **state) {
                     ARGPARSE_OK, \
                     option_add_argument(expected_options[0], operand_new(#modifier)) \
                     ); \
-            const char *arguments[] = { prefix#arg, #modifier }; \
+            char *arguments[] = { prefix#arg, #modifier }; \
             wrapper(state, expected_options, NULL, parsed_options, NULL, arguments, 2); \
         }
 

@@ -148,7 +148,7 @@ option *option_find(const args *args, const char *opt);
  *              operands
  *  \returns ARGPARSEcode
  */
-ARGPARSEcode args_parse(args *args, const size_t argc, const char **const argv);
+ARGPARSEcode args_parse(args *args, size_t argc, char **argv);
 
 /** Writes help generated from the args struct to the passed stream.
  *
