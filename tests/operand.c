@@ -4,7 +4,7 @@
 /** Uses operand_parse() to create a new operand list and checks that
  * the parsed operands are in the order specified in result.
  */
-static void operand_wrapper(const char *string, char *result[], const char delimiter) {
+static void operand_wrapper(const char *string, char **result, const char delimiter) {
     assert_non_null(string);
     assert_non_null(result);
 

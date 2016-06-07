@@ -1,4 +1,5 @@
 #include "common.h"
+#include "option.h"
 
 static void args_empty(void **state) {
     args *args = *state;
