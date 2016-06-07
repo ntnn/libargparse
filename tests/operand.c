@@ -11,7 +11,7 @@ static void operand_wrapper(const char *string, char *result[], const char delim
     operand *op = operand_parse(string, delimiter);
 
     assert_non_null(result[0]);
-    size_t len = sizeof(result) / sizeof(result[0]);
+    size_t len = LENGTH(result);
 
     operand *cur = op;
     for (size_t i = 0; i < len; ++i) {
