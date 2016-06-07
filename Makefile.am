@@ -19,6 +19,7 @@ libargparse_la_SOURCES = src/argparse.c \
 			 src/option.h \
 			 src/option.c \
 			 src/parse.c
+libargparse_la_LDFLAGS = -version-info 0:1:0
 include_HEADERS = src/argparse.h
 
 TESTS = tests/argparse \
