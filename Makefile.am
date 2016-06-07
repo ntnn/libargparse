@@ -35,11 +35,6 @@ tests_operand_SOURCES = tests/common.c tests/operand.c
 tests_option_SOURCES = tests/common.c tests/option.c
 tests_parse_SOURCES = tests/common.c tests/parse.c
 
-examplesdir = examples
-examples_PROGRAMS = examples/echo
-examples_echo_SOURCES = examples/echo.c
-examples_echo_LDADD = libargparse.la
-
 @DX_RULES@
 
 clean-doc:
