@@ -38,12 +38,18 @@ static void add_operand_passed_null(void **state) {
 }
 
 int main() {
+    #define TEST(test) cmocka_unit_test_setup_teardown( \
+            test, \
+            common_setup, \
+            common_teardown \
+            )
+
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(args_empty),
-        cmocka_unit_test(add_option_passed_null),
-        cmocka_unit_test(empty_option_fail),
-        cmocka_unit_test(add_operand_passed_null),
+        TEST(args_empty),
+        TEST(add_option_passed_null),
+        TEST(empty_option_fail),
+        TEST(add_operand_passed_null),
     };
 
-    return cmocka_run_group_tests(tests, common_setup, common_teardown);
+    return cmocka_run_group_tests(tests, NULL, NULL);
 }
