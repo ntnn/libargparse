@@ -28,7 +28,7 @@ TESTS = tests/argparse \
 	tests/parse
 
 check_PROGRAMS = $(TESTS)
-CFLAGS += -lcmocka
+CFLAGS += -Itests -lcmocka
 LDADD = libargparse.la
 
 tests_argparse_SOURCES = tests/common.c tests/argparse.c
