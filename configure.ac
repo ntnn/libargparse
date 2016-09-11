@@ -2,6 +2,7 @@ AC_INIT(argparse, 0.0.1, nelo@wallus.de)
 AC_CONFIG_AUX_DIR(etc)
 
 AC_PROG_CC
+AC_PROG_CC_STDC
 AC_PROG_CPP
 AC_PROG_INSTALL
 
