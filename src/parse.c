@@ -54,9 +54,9 @@ option *parse_long(args *args, const char *argument) {
     };
 
     // index that separates present=1 and present=-1
-    int sepindex = 3;
+    size_t sepindex = 3;
 
-    for (int j = 0; j < sizeof(prefixes) / sizeof(char*); ++j) {
+    for (size_t j = 0; j < sizeof(prefixes) / sizeof(char*); ++j) {
         char *prefix = prefixes[j];
         if (strncmp(argument,
                     prefix,
