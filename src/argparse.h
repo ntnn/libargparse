@@ -68,6 +68,33 @@ typedef struct {
     operand *operands; /** Operands */
 } args;
 
+/** Struct representing a subcommand.
+ *  Each member is initialized as NULL or 0.
+ *
+ *  The next pointer is necessary for subcommands_free() and
+ *  subcommands_parse() to work correctly and also used to order the
+ *  output for help().
+ */
+typedef struct {
+    args *args; /** Arguments attached to subcommand */
+    char *name; /** Name of subcommand */
+    char *description; /** Description for help output */
+    void *next; /** Pointer to next subcommand */
+} subcommand;
+
+/** Struct representing multiple subcommands
+ * Utility struct used to keep a next-pointer out of the subcommand
+ * struct.
+ *
+ * Additionally this allows for global arguments, e.g.:
+ *  cmd --global-argument subcommand --scmd-argument
+ */
+typedef struct {
+    subcommand *scmd;
+    args *args;
+    size_t count; /** Number of subcommands */
+} subcommands;
+
 /** Return codes for argparse functions.
  * String representations can be obtained via args_error()
  */
@@ -77,6 +104,8 @@ typedef enum {
     ARGPARSE_EMPTY_OPTION, /** Passed option's short_opt and long_opt are empty */
     ARGPARSE_FALSE_RETURN, /** An unexpected value was returned */
     ARGPARSE_ARG_REQUIRED, /** An option-argument is required but none was supplied */
+    ARGPARSE_ARGS_EXIST, /** Trying to attach an args struct to a struct which already has an args struct */
+    ARGPARSE_ARGS_EMPTY, /** Passed args struct is empty */
 } ARGPARSEcode;
 
 /** Initializer for args struct. */
@@ -157,5 +186,56 @@ ARGPARSEcode args_parse(args *args, size_t argc, char **argv);
  *  \returns ARGPARSEcode
  */
 ARGPARSEcode args_help(const args *args, FILE *stream);
+
+/** Initializer for subcommand struct.  */
+subcommand *subcommand_new();
+
+/** Recursively free subcommand struct. */
+void subcommand_free(subcommand *scmd);
+
+/** Attach an args struct to a subcommand
+ * Can only be executed once, since each subcommand can only hold one
+ * args struct at any time.
+ *
+ * \returns ARGPARSE_OK on success
+ *          ARGPARSE_ARGS_EXIST an args struct is already attached
+ *          ARGPARSE_EMPTY_ARGS passed args struct is empty
+ */
+ARGPARSEcode subcommand_attach_args(subcommand *scmd, args *args);
+
+/** Add option to args struct attached to subcommand.
+ * If no args struct is attached to the subcommand it will be created.
+ *
+ * Also see args_add_option().
+ */
+ARGPARSEcode subcommand_add_option(subcommand *scmd, option *opt);
+
+/** Add operand to args struct attached to subcommand.
+ * If no args struct is attached to the subcommand it will be created.
+ *
+ * Also see args_add_operand().
+ */
+ARGPARSEcode subcommand_add_operand(subcommand *scmd, operand *op);
+
+ARGPARSEcode subcommand_help(const subcommand *scmd, FILE *stream);
+
+subcommands *subcommands_new();
+
+/** Add subcommand struct to subcommands. */
+ARGPARSEcode subcommands_add_scmd(subcommands *subcommands, subcommand *scmd);
+
+/** Add args struct to subcommands struct.
+ * Can only be executed once, since each subcommands struct can only
+ * hold one args struct at any time.
+ *
+ * \returns ARGPARSE_OK on success
+ *          ARGPARSE_ARGS_EXIST an args struct is already attached
+ *          ARGPARSE_EMPTY_ARGS passed args struct is empty
+ */
+ARGPARSEcode subcommands_add_args(subcommands *subcommands, args *args);
+
+ARGPARSEcode subcommands_free(subcommands *subcommands);
+ARGPARSEcode subcommands_parse(args *args, size_t argc, char **argv);
+ARGPARSEcode subcommands_help(const subcommands *subcommands, FILE *stream);
 
 #endif // ARGPARSE_ARGPARSE_H
