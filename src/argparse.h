@@ -196,16 +196,6 @@ subcommand *subcommand_new();
 /** Recursively free subcommand struct. */
 void subcommand_free(subcommand *scmd);
 
-/** Attach an args struct to a subcommand
- * Can only be executed once, since each subcommand can only hold one
- * args struct at any time.
- *
- * \returns ARGPARSE_OK on success
- *          ARGPARSE_ARGS_EXIST an args struct is already attached
- *          ARGPARSE_EMPTY_ARGS passed args struct is empty
- */
-ARGPARSEcode subcommand_attach_args(subcommand *scmd, args *args);
-
 /** Add option to args struct attached to subcommand.
  * If no args struct is attached to the subcommand it will be created.
  *

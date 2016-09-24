@@ -30,18 +30,6 @@ void subcommand_free(subcommand *scmd) {
     free(scmd);
 }
 
-ARGPARSEcode subcommand_attach_args(subcommand *scmd, args *args) {
-    if (!args)
-        return ARGPARSE_PASSED_NULL;
-
-    if (scmd->args)
-        return ARGPARSE_ARGS_EXIST;
-
-    scmd->args = args;
-
-    return ARGPARSE_OK;
-}
-
 ARGPARSEcode subcommand_add_option(subcommand *scmd, option *opt) {
     if (!scmd->args)
         scmd->args = args_new();
