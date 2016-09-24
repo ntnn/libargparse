@@ -32,6 +32,7 @@ libargparse_la_LDFLAGS = -version-info 0:1:0
 include_HEADERS = src/argparse.h
 
 TESTS = tests/argparse \
+	tests/subcommands \
 	tests/subcommand \
 	tests/operand \
 	tests/option \
@@ -42,6 +43,7 @@ CFLAGS += -Itests -lcmocka
 LDADD = libargparse.la
 
 tests_argparse_SOURCES = tests/common.c tests/argparse.c
+tests_subcommands_SOURCES = tests/common.c tests/subcommands.c
 tests_subcommand_SOURCES = tests/common.c tests/subcommand.c
 tests_operand_SOURCES = tests/common.c tests/operand.c
 tests_option_SOURCES = tests/common.c tests/option.c

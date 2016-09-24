@@ -32,6 +32,22 @@ int scmd_teardown(void **state) {
     return EXIT_SUCCESS;
 }
 
+int scmds_setup(void **state) {
+    subcommands *scmds = subcommands_new();
+    if (!scmds)
+        return EXIT_FAILURE;
+
+    *state = scmds;
+
+    return EXIT_SUCCESS;
+}
+
+int scmds_teardown(void **state) {
+    subcommands_free(*state);
+
+    return EXIT_SUCCESS;
+}
+
 option *common_option_wrapper(
         const char *shopt,
         const char *lopt,

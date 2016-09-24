@@ -21,6 +21,11 @@ int scmd_setup(void **state);
 /** Teardown function freeing scmd struct pointed to by state */
 int scmd_teardown(void **state);
 
+/** Setup function storing pointer to scmds struct in state */
+int scmds_setup(void **state);
+/** Teardown function freeing scmds struct pointed to by state */
+int scmds_teardown(void **state);
+
 /** Wrapper to create options */
 option *common_option_wrapper(
         const char *shopt,
