@@ -13,7 +13,7 @@ Given this code:
     opt->long_opt = "feature";
 \endcode
 
-The following arguments are all parsed into opt:
+The following arguments will be recognized and parsed into opt:
     * -f
     * +f
     * --feature
