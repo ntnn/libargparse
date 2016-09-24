@@ -2,11 +2,15 @@
 
 subcommands *subcommands_new() {
     subcommands *scmds = NULL;
+    scmds = malloc(sizeof(subcommands));
+
     if (!scmds)
         return NULL;
 
     scmds->args = NULL;
     scmds->count = 0;
+    scmds->scmd = NULL;
+    scmds->description = NULL;
 
     return scmds;
 }
