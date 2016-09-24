@@ -15,9 +15,9 @@ subcommand *subcommand_new() {
     return scmd;
 }
 
-ARGPARSEcode subcommand_free(subcommand *scmd) {
+void subcommand_free(subcommand *scmd) {
     if (!scmd)
-        return ARGPARSE_PASSED_NULL;
+        return;
 
     if (scmd->args)
         args_free(scmd->args);
@@ -28,8 +28,6 @@ ARGPARSEcode subcommand_free(subcommand *scmd) {
     scmd->next = NULL;
 
     free(scmd);
-
-    return ARGPARSE_OK;
 }
 
 ARGPARSEcode subcommand_attach_args(subcommand *scmd, args *args) {

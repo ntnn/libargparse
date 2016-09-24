@@ -223,7 +223,7 @@ ARGPARSEcode subcommand_add_operand(subcommand *scmd, operand *op);
 ARGPARSEcode subcommand_help(const subcommand *scmd, FILE *stream);
 
 subcommands *subcommands_new();
-ARGPARSEcode subcommands_free(subcommands *scmds);
+void subcommands_free(subcommands *scmds);
 
 /** Add subcommand struct to subcommands. */
 ARGPARSEcode subcommands_add_scmd(subcommands *scmds, subcommand *scmd);

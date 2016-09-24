@@ -11,9 +11,9 @@ subcommands *subcommands_new() {
     return scmds;
 }
 
-ARGPARSEcode subcommands_free(subcommands *scmds) {
+void subcommands_free(subcommands *scmds) {
     if (!scmds)
-        return ARGPARSE_PASSED_NULL;
+        return;
 
     if (scmds->scmd)
         subcommand_free(scmds->scmd);
@@ -24,8 +24,6 @@ ARGPARSEcode subcommands_free(subcommands *scmds) {
     scmds->args = NULL;
 
     free(scmds);
-
-    return ARGPARSE_OK;
 }
 
 ARGPARSEcode subcommands_add_scmd(subcommands *scmds, subcommand *scmd) {
