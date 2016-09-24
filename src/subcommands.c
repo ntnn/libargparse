@@ -52,12 +52,18 @@ ARGPARSEcode subcommands_add_scmd(subcommands *scmds, subcommand *scmd) {
 }
 
 ARGPARSEcode subcommands_parse(subcommands *scmds, size_t argc, char **argv) {
-    if (!scmds)
+    if (!scmds || !argv)
         return ARGPARSE_PASSED_NULL;
 
-    // TODO
+    subcommand *scmd = scmds->scmd;
+    while (scmd != NULL) {
+        if (strcmp(scmd->name, *argv) == 0)
+            return args_parse(scmd->args, argc--, argv++);
 
-    return ARGPARSE_OK;
+        scmd = scmd->next;
+    }
+
+    return ARGPARSE_NO_MATCH_FOUND;
 }
 
 ARGPARSEcode subcommands_help(const subcommands *scmds, FILE *stream) {
