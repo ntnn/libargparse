@@ -226,7 +226,7 @@ subcommands *subcommands_new();
 ARGPARSEcode subcommands_free(subcommands *scmds);
 
 /** Add subcommand struct to subcommands. */
-ARGPARSEcode subcommands_add_scmd(subcommands *subcommands, subcommand *scmd);
+ARGPARSEcode subcommands_add_scmd(subcommands *scmds, subcommand *scmd);
 
 /** Add args struct to subcommands struct.
  * Can only be executed once, since each subcommands struct can only
@@ -238,7 +238,7 @@ ARGPARSEcode subcommands_add_scmd(subcommands *subcommands, subcommand *scmd);
  */
 ARGPARSEcode subcommands_add_args(subcommands *subcommands, args *args);
 
-ARGPARSEcode subcommands_parse(args *args, size_t argc, char **argv);
-ARGPARSEcode subcommands_help(const subcommands *subcommands, FILE *stream);
+ARGPARSEcode subcommands_parse(subcommands *scmds, size_t argc, char **argv);
+ARGPARSEcode subcommands_help(const subcommands *scmds, FILE *stream);
 
 #endif // ARGPARSE_ARGPARSE_H
