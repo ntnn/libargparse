@@ -8,6 +8,7 @@ tests/operand
 tests/option
 tests/parse
 tests/subcommand
+tests/subcommands
 
 examples/echo
 
