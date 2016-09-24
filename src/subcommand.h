@@ -3,6 +3,7 @@
 
 #include "argparse.h"
 #include "argparse_private.h"
+#include "operand.h"
 
 /** Add operand to args struct attached to subcommand.
  * If no args struct is attached to the subcommand it will be created.
