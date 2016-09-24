@@ -54,12 +54,16 @@ ARGPARSEcode subcommands_parse(subcommands *scmds, size_t argc, char **argv) {
     if (!scmds)
         return ARGPARSE_PASSED_NULL;
 
+    // TODO
+
     return ARGPARSE_OK;
 }
 
 ARGPARSEcode subcommands_help(const subcommands *scmds, FILE *stream) {
     if (!scmds || !stream)
         return ARGPARSE_PASSED_NULL;
+
+    // TODO
 
     return ARGPARSE_OK;
 }
