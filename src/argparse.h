@@ -118,6 +118,7 @@ typedef enum {
     ARGPARSE_ARG_REQUIRED, /** An option-argument is required but none was supplied */
     ARGPARSE_ARGS_EXIST, /** Trying to attach an args struct to a struct which already has an args struct */
     ARGPARSE_ARGS_EMPTY, /** Passed args struct is empty */
+    ARGPARSE_NO_MATCH_FOUND, /** No matching subcommand or option has been found */
 } ARGPARSEcode;
 
 /** Initializer for args struct. */

@@ -70,7 +70,16 @@ ARGPARSEcode subcommands_help(const subcommands *scmds, FILE *stream) {
     if (!scmds || !stream)
         return ARGPARSE_PASSED_NULL;
 
-    // TODO
+    fprintf(stream, "%s: %s\n\n", scmds->name, scmds->description);
+    fprintf(stream, "Global options:\n");
+    args_help(scmds->args, stream);
+
+    subcommand *scmd = scmds->scmd;
+    while (scmd != NULL) {
+        // TODO padding
+        fprintf(stream, "%s: %s\n", scmd->name, scmd->description);
+        scmd = scmd->next;
+    }
 
     return ARGPARSE_OK;
 }
