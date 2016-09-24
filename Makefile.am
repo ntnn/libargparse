@@ -4,12 +4,17 @@ AM_LDFLAGS =
 if ENABLE_COVERAGE
 AM_CFLAGS += --coverage
 AM_LDFLAGS += --coverage
+GCOV ?= gcov --relative-only --object-directory src/.libs
 
 coverage-reset:
-	@find . -iname '*.gcno' -or -iname '*.gcda' -or -iname '*.gcov' -delete
+	@find . -name '*.gcno' -or -name '*.gcda' -or -name '*.gcov' -delete
 
-coverage:
-	gcov -f -o src/.libs $(libargparse_la_SOURCES)
+coverage: $(libargparse_la_SOURCES)
+	$(GCOV) $^
+
+coverage-func: $(libargparse_la_SOURCES)
+	$(GCOV) --function-summaries $^
+
 endif
 
 lib_LTLIBRARIES = libargparse.la
