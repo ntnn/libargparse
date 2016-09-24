@@ -1,7 +1,0 @@
-general:
-- getopt replacement
-- subcommands
-- help output
-- parseable subcommand, option, etc.pp. output for completions
-- additive options (-fFEATURE -fFEATURE2 => -fFEATURE,FEATURE2)
-  allow subtractions (-fFEATURE,FEATURE2 +fFEATURE => -fFEATURE)
