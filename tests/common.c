@@ -16,6 +16,22 @@ int common_teardown(void **state) {
     return EXIT_SUCCESS;
 }
 
+int scmd_setup(void **state) {
+    subcommand *scmd = subcommand_new();
+    if (!scmd)
+        return EXIT_FAILURE;
+
+    *state = scmd;
+
+    return EXIT_SUCCESS;
+}
+
+int scmd_teardown(void **state) {
+    subcommand_free(*state);
+
+    return EXIT_SUCCESS;
+}
+
 option *common_option_wrapper(
         const char *shopt,
         const char *lopt,

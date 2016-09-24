@@ -7,6 +7,7 @@ tests/argparse
 tests/operand
 tests/option
 tests/parse
+tests/subcommand
 
 examples/echo
 

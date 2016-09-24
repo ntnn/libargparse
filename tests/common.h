@@ -16,6 +16,11 @@ int common_setup(void **state);
 /** Teardown function freeing args struct pointed to by state */
 int common_teardown(void **state);
 
+/** Setup function storing pointer to scmd struct in state */
+int scmd_setup(void **state);
+/** Teardown function freeing scmd struct pointed to by state */
+int scmd_teardown(void **state);
+
 /** Wrapper to create options */
 option *common_option_wrapper(
         const char *shopt,
