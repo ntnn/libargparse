@@ -10,6 +10,7 @@ subcommands *subcommands_new() {
     scmds->args = NULL;
     scmds->count = 0;
     scmds->scmd = NULL;
+    scmds->name = NULL;
     scmds->description = NULL;
 
     return scmds;

@@ -102,6 +102,7 @@ typedef struct {
 typedef struct {
     subcommand *scmd;
     args *args;
+    char *name; /** Name of your application, used for help output */
     char *description; /** Description of your application, used for help output */
     size_t count; /** Number of subcommands */
 } subcommands;
