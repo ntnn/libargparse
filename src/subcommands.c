@@ -34,6 +34,8 @@ ARGPARSEcode subcommands_add_scmd(subcommands *scmds, subcommand *scmd) {
     if (!scmds || !scmd)
         return ARGPARSE_PASSED_NULL;
 
+    scmds->count++;
+
     if (!scmds->scmd) {
         scmds->scmd = scmd;
         return ARGPARSE_OK;
