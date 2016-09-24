@@ -14,6 +14,10 @@ endif
 
 lib_LTLIBRARIES = libargparse.la
 libargparse_la_SOURCES = src/argparse.c \
+			 src/subcommand.h \
+			 src/subcommand.c \
+			 src/subcommands.h \
+			 src/subcommands.c \
 			 src/operand.h \
 			 src/operand.c \
 			 src/option.h \
