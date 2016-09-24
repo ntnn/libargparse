@@ -211,13 +211,6 @@ void subcommand_free(subcommand *scmd);
  */
 ARGPARSEcode subcommand_add_option(subcommand *scmd, option *opt);
 
-/** Add operand to args struct attached to subcommand.
- * If no args struct is attached to the subcommand it will be created.
- *
- * Also see args_add_operand().
- */
-ARGPARSEcode subcommand_add_operand(subcommand *scmd, operand *op);
-
 ARGPARSEcode subcommand_help(const subcommand *scmd, FILE *stream);
 
 subcommands *subcommands_new();
