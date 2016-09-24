@@ -9,7 +9,7 @@ coverage-reset:
 	@find . -iname '*.gcno' -or -iname '*.gcda' -or -iname '*.gcov' -delete
 
 coverage:
-	gcov -o src/.libs $(libargparse_la_SOURCES)
+	gcov -f -o src/.libs $(libargparse_la_SOURCES)
 endif
 
 lib_LTLIBRARIES = libargparse.la
