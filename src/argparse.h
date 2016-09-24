@@ -29,6 +29,13 @@
 #include <string.h>
 #include <stdio.h>
 
+/** How long a long option can be before an additional newline is
+ * inserted and the description printed on a new line.
+ **/
+#ifndef ARGPARSE_MAXLEN_LONG_OPT
+#define ARGPARSE_MAXLEN_LONG_OPT 15
+#endif
+
 /** Struct representing an operand */
 typedef struct {
     // TODO: make string always contain the result and number be 0 or
@@ -80,6 +87,7 @@ typedef struct {
 typedef struct {
     args *args; /** Arguments attached to subcommand */
     char *name; /** Name of subcommand */
+    char *short_description; /** Short description for help output. */
     char *description; /** Description for help output */
     void *next; /** Pointer to next subcommand */
 } subcommand;

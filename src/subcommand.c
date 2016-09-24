@@ -48,6 +48,10 @@ ARGPARSEcode subcommand_help(const subcommand *scmd, FILE *stream) {
     if (!scmd || !stream)
         return ARGPARSE_PASSED_NULL;
 
-    // TODO
-    return ARGPARSE_OK;
+    fprintf(stream, "%s:\n%s", scmd->name);
+
+    if (scmd->args)
+        return args_help(scmd->args, stream);
+
+    return ARGPARSE_PASSED_NULL;
 }

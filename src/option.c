@@ -40,20 +40,39 @@ void option_free(option *opt) {
     free(opt);
 }
 
-ARGPARSEcode option_help(const option *opt, FILE *stream) {
+ARGPARSEcode option_help(const option *opt, size_t padding, FILE *stream) {
     fprintf(stream, "  ");
 
     if (opt->short_opt)
-        fprintf(stream, "-%s ", opt->short_opt);
+        fprintf(stream, "-%s", opt->short_opt);
+    else
+        fprintf(stream, "  ");
+
+    fprintf(stream, " ");
 
     if (opt->long_opt)
         fprintf(stream, "--%s", opt->long_opt);
 
-    if (opt->description)
-        fprintf(stream, "\t%s", opt->description);
+
+    // TODO split long descriptions where appropriate and pad
+    if (opt->description) {
+        if (strlen(opt->long_opt) >= ARGPARSE_MAXLEN_LONG_OPT)
+            fprintf(stream, "\n%*s", padding, "");
+        else
+            fprintf(stream, "%*s", padding - option_padding(opt));
+
+        fprintf(stream, "%s", opt->description);
+    }
 
     fprintf(stream, "\n");
     return ARGPARSE_OK;
+}
+
+size_t option_padding(option *opt) {
+    // 5 is the magic number for the leading two spaces to indent, the
+    // two characters representing the short option and the space
+    // separating the short and the long option
+    return 5 + strlen(opt->long_opt);
 }
 
 option *option_find(const args *args, const char *opt) {

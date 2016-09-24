@@ -72,9 +72,10 @@ ARGPARSEcode args_help(const args *args, FILE *stream) {
     if (!args || !stream)
         return ARGPARSE_PASSED_NULL;
 
+    size_t padding = args_max_pad(args);
     option *opt = args->opts;
     while (opt) {
-        ARGPARSEcode ret = option_help(opt, stream);
+        ARGPARSEcode ret = option_help(opt, padding, stream);
 
         if (ret)
             return ret;
@@ -83,4 +84,15 @@ ARGPARSEcode args_help(const args *args, FILE *stream) {
     }
 
     return ARGPARSE_OK;
+}
+
+size_t args_max_pad(const args *args) {
+    size_t max_pad = 0;
+
+    for (option *cur = args->opts; cur != NULL; cur = cur->next) {
+        if (option_padding(cur) > max_pad)
+            max_pad = option_padding(cur);
+    }
+
+    return max_pad;
 }
