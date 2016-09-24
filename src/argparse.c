@@ -37,13 +37,15 @@ ARGPARSEcode args_add_option(args *args, option *opt) {
             && strcmp("", opt->long_opt) == 0)
         return ARGPARSE_EMPTY_OPTION;
 
-    option *last = args->opts;
-    if (last != NULL) {
-        while (last->next != NULL)
-            last = last->next;
-        last->next = opt;
-    } else
+    if (!args->opts) {
         args->opts = opt;
+        return ARGPARSE_OK;
+    }
+
+    option *last = args->opts;
+    while (last->next != NULL)
+        last = last->next;
+    last->next = opt;
 
     return ARGPARSE_OK;
 }
