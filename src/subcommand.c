@@ -27,6 +27,10 @@ void subcommand_free(subcommand *scmd) {
         subcommand_free(scmd->next);
     scmd->next = NULL;
 
+    scmd->name = NULL;
+    scmd->short_description = NULL;
+    scmd->description = NULL;
+
     free(scmd);
 }
 
