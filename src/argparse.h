@@ -228,17 +228,7 @@ ARGPARSEcode subcommands_free(subcommands *scmds);
 /** Add subcommand struct to subcommands. */
 ARGPARSEcode subcommands_add_scmd(subcommands *scmds, subcommand *scmd);
 
-/** Add args struct to subcommands struct.
- * Can only be executed once, since each subcommands struct can only
- * hold one args struct at any time.
- *
- * \returns ARGPARSE_OK on success
- *          ARGPARSE_ARGS_EXIST an args struct is already attached
- *          ARGPARSE_EMPTY_ARGS passed args struct is empty
- */
-ARGPARSEcode subcommands_add_args(subcommands *subcommands, args *args);
-
-ARGPARSEcode subcommands_parse(subcommands *scmds, size_t argc, char **argv);
-ARGPARSEcode subcommands_help(const subcommands *scmds, FILE *stream);
+ARGPARSEcode subcommands_parse(args *args, size_t argc, char **argv);
+ARGPARSEcode subcommands_help(const subcommands *subcommands, FILE *stream);
 
 #endif // ARGPARSE_ARGPARSE_H
