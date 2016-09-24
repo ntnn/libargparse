@@ -31,6 +31,8 @@
 
 /** Struct representing an operand */
 typedef struct {
+    // TODO: make string always contain the result and number be 0 or
+    //       the result of atoi(), add a boolean flag
     char *string; /** Passed string, if string cannot be converted to a number with atoi() */
     int number; /** Passed string converted to number, 0 if conversion fails */
 
