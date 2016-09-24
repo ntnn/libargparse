@@ -57,9 +57,9 @@ ARGPARSEcode option_help(const option *opt, size_t padding, FILE *stream) {
     // TODO split long descriptions where appropriate and pad
     if (opt->description) {
         if (strlen(opt->long_opt) >= ARGPARSE_MAXLEN_LONG_OPT)
-            fprintf(stream, "\n%*s", padding, "");
+            fprintf(stream, "\n%*s", padding, " ");
         else
-            fprintf(stream, "%*s", padding - option_padding(opt));
+            fprintf(stream, "%*s", padding - option_padding(opt) + 2, " ");
 
         fprintf(stream, "%s", opt->description);
     }
