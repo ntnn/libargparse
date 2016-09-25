@@ -15,7 +15,7 @@ coverage: $(libargparse_la_SOURCES)
 coverage-func: $(libargparse_la_SOURCES)
 	$(GCOV) --function-summaries $^
 
-endif
+endif # ENABLE_COVERAGE
 
 lib_LTLIBRARIES = libargparse.la
 libargparse_la_SOURCES = src/argparse.c \
