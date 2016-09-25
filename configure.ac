@@ -27,6 +27,14 @@ AC_ARG_ENABLE(coverage,
               )
 AM_CONDITIONAL(ENABLE_COVERAGE, test "x$enable_coverage" = "xyes")
 
+# --enable-checks
+AC_ARG_ENABLE(checks,
+              AS_HELP_STRING(--enable-checks, compile checks),
+              enable_checks="$enable_checks",
+              enable_check="no"
+              )
+AM_CONDITIONAL(ENABLE_CHECKS, test "x$enable_checks" = "xyes")
+
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_OUTPUT
 
